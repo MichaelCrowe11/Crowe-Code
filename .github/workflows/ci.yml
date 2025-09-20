@@ -1,0 +1,303 @@
+# CI/CD Pipeline for CroweCode Platform
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+# Allow only one concurrent deployment
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Security Scanning - runs first to fail fast on security issues
+  security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better secret detection
+
+      - name: Run Gitleaks Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Run Semgrep Security Analysis
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/secrets
+            p/react
+            p/typescript
+            p/nodejs
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+  # Code Quality & Testing
+  test:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run test coverage
+        run: npm run test:coverage
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+  # Build Test
+  build:
+    runs-on: ubuntu-latest
+    needs: [security-scan, test]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build application
+        run: npm run build
+        env:
+          JWT_SECRET: test-jwt-secret-for-build-32-chars
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+          XAI_API_KEY: test-key
+          OPENAI_API_KEY: test-key  
+          ANTHROPIC_API_KEY: test-key
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            .next/
+            !.next/cache/
+          retention-days: 1
+
+  # E2E Testing (only on main branch)
+  e2e-test:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .next/
+
+      - name: Start application
+        run: |
+          npm start &
+          sleep 10
+        env:
+          JWT_SECRET: test-jwt-secret-for-e2e-tests-32-chars
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+          PORT: 3000
+
+      - name: Run Playwright tests
+        run: npm run test:smoke
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 3
+
+  # Performance Testing (only on main)
+  performance-test:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .next/
+
+      - name: Start application for performance testing
+        run: |
+          npm start &
+          sleep 15
+        env:
+          JWT_SECRET: test-jwt-secret-for-perf-32-chars
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+          PORT: 3000
+
+      - name: Run performance tests
+        run: npm run test:performance
+        continue-on-error: true
+
+  # Security audit for dependencies
+  audit:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Run Snyk vulnerability scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium
+        continue-on-error: true
+
+  # Deployment (only on main branch, after all tests pass)
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [test, build, audit]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    environment:
+      name: staging
+      url: https://crowecode-staging.fly.dev
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to staging
+        run: flyctl deploy --config fly.staging.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Run smoke tests on staging
+        run: |
+          sleep 30 # Wait for deployment
+          curl -f https://crowecode-staging.fly.dev/api/health || exit 1
+
+  # Production deployment (manual approval required)
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [e2e-test, performance-test, deploy-staging]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    environment:
+      name: production
+      url: https://crowecode.fly.dev
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to production
+        run: flyctl deploy --config fly.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Run production smoke tests
+        run: |
+          sleep 30 # Wait for deployment
+          curl -f https://crowecode.fly.dev/api/health || exit 1
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          text: 'CroweCode Platform deployed to production! 🚀'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()

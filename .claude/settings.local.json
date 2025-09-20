@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(fly ssh console:*)",
+      "Bash(stripe prices create:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

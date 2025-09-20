@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_APP_URL": "https://croweos.com"
+    }
+  }
+}

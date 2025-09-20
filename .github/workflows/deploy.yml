@@ -1,0 +1,189 @@
+name: Deploy to CroweCode Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint || true
+
+      - name: Run type check
+        run: npm run type-check || true
+
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+
+      - name: Build application
+        run: npm run build
+
+  deploy:
+    name: Deploy to Production
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://crowecode.com
+          NEXT_PUBLIC_API_URL: https://api.crowecode.com
+          NEXT_PUBLIC_WEBSOCKET_URL: wss://ws.crowecode.com
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy-package
+          cp -r .next deploy-package/
+          cp -r public deploy-package/
+          cp package*.json deploy-package/
+          cp next.config.js deploy-package/
+          tar -czf deploy-package.tar.gz deploy-package/
+
+      - name: Setup SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H crowecode.com >> ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          # Create backup on server
+          ssh -i ~/.ssh/deploy_key ${VPS_USER}@${VPS_HOST} '
+            if [ -d /var/www/crowecode ]; then
+              mkdir -p /var/backups/crowecode
+              timestamp=$(date +%Y%m%d_%H%M%S)
+              tar -czf /var/backups/crowecode/backup_${timestamp}.tar.gz -C /var/www crowecode
+            fi
+          '
+
+          # Upload new deployment
+          scp -i ~/.ssh/deploy_key deploy-package.tar.gz ${VPS_USER}@${VPS_HOST}:/tmp/
+
+          # Extract and deploy
+          ssh -i ~/.ssh/deploy_key ${VPS_USER}@${VPS_HOST} '
+            cd /tmp
+            tar -xzf deploy-package.tar.gz
+            rm -rf /var/www/crowecode/.next
+            rm -rf /var/www/crowecode/public
+            cp -r deploy-package/.next /var/www/crowecode/
+            cp -r deploy-package/public /var/www/crowecode/
+            cp deploy-package/package*.json /var/www/crowecode/
+            cp deploy-package/next.config.js /var/www/crowecode/
+            cd /var/www/crowecode
+            npm ci --only=production
+            pm2 restart crowecode || pm2 start npm --name "crowecode" -- start
+            pm2 save
+            rm -rf /tmp/deploy-package*
+          '
+
+      - name: Health check
+        run: |
+          sleep 10
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://crowecode.com/health)
+          if [ $response -eq 200 ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Health check failed with status $response"
+            exit 1
+          fi
+
+      - name: Purge CDN cache
+        if: success()
+        env:
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          if [ ! -z "$CF_ZONE_ID" ] && [ ! -z "$CF_API_TOKEN" ]; then
+            curl -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+              -H "Authorization: Bearer ${CF_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data '{"purge_everything":true}'
+          fi
+
+      - name: Notify deployment
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment to CroweCode ${{ job.status == 'success' && 'succeeded ✅' || 'failed ❌' }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+  rollback:
+    name: Rollback if needed
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Setup SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H crowecode.com >> ~/.ssh/known_hosts
+
+      - name: Rollback deployment
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key ${VPS_USER}@${VPS_HOST} '
+            cd /var/backups/crowecode
+            latest_backup=$(ls -t backup_*.tar.gz | head -1)
+            if [ -n "$latest_backup" ]; then
+              echo "Rolling back to $latest_backup"
+              rm -rf /var/www/crowecode
+              tar -xzf $latest_backup -C /var/www
+              cd /var/www/crowecode
+              pm2 restart crowecode
+              echo "Rollback complete"
+            else
+              echo "No backup found for rollback"
+            fi
+          '

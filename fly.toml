@@ -1,0 +1,93 @@
+# Fly.io Configuration for Crowe Logic Platform
+# Run 'fly launch' to create app, then 'fly deploy' to deploy
+
+app = "crowecode-main"
+primary_region = "iad"  # US East (Ashburn)
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+[build]
+  dockerfile = "Dockerfile"
+  
+[build.args]
+  NEXT_PUBLIC_APP_URL = "https://crowecode-main.fly.dev"
+
+[deploy]
+  # release_command = "npx prisma migrate deploy" # Temporarily disabled due to migration issue
+
+[env]
+  PORT = "3000"
+  NODE_ENV = "production"
+  NEXT_TELEMETRY_DISABLED = "1"
+  
+  # Feature flags
+  ENABLE_QUANTUM_MODULE = "true"
+  ENABLE_ML_LAB = "true"
+  ENABLE_AGRICULTURE = "true"
+  ENABLE_MYCOLOGY_LIMS = "true"
+  ENABLE_VOICE_ASSISTANT = "true"
+  
+  # Performance
+  NODE_OPTIONS = "--max-old-space-size=512"
+
+[experimental]
+  auto_rollback = true
+
+[[services]]
+  processes = ["app"]
+  internal_port = 3000
+  protocol = "tcp"
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+    
+  [[services.http_checks]]
+    interval = "30s"
+    grace_period = "10s"
+    method = "get"
+    path = "/api/health"
+    protocol = "http"
+    timeout = "5s"
+    tls_skip_verify = false
+    
+    [services.http_checks.headers]
+      X-Health-Check = "fly"
+
+# Machine configuration
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+# Scaling configuration
+[metrics]
+  port = 9091
+  path = "/metrics"
+
+# Static files
+[[statics]]
+  guest_path = "/app/public"
+  url_prefix = "/"
+
+# Persistent storage for uploads
+[mounts]
+  source = "crowe_code_data"
+  destination = "/data"
+
+# Process groups for scaling
+[processes]
+  app = "node server.js"

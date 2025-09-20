@@ -1,0 +1,257 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crowe-platform
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crowe-logic-platform
+  namespace: crowe-platform
+  labels:
+    app: crowe-logic-platform
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: crowe-logic-platform
+  template:
+    metadata:
+      labels:
+        app: crowe-logic-platform
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: crowe-workload-identity
+      containers:
+      - name: crowe-app
+        image: gcr.io/PROJECT_ID/crowe-logic-platform:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: GCP_PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: crowe-config
+              key: project_id
+        - name: GCP_LOCATION
+          valueFrom:
+            configMapKeyRef:
+              name: crowe-config
+              key: location
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: crowe-secrets
+              key: database_url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: crowe-secrets
+              key: redis_url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: crowe-secrets
+              key: jwt_secret
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: crowe-secrets
+              key: nextauth_secret
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/var/secrets/google/key.json"
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+          readOnly: true
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.0
+        args:
+          - "--structured-logs"
+          - "--port=5432"
+          - "PROJECT_ID:REGION:DB_INSTANCE"
+        securityContext:
+          runAsNonRoot: true
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: vertex-ai-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crowe-logic-platform
+  namespace: crowe-platform
+  labels:
+    app: crowe-logic-platform
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: crowe-logic-platform
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crowe-config
+  namespace: crowe-platform
+data:
+  project_id: "crowe-logic-platform"
+  location: "us-central1"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: crowe-workload-identity
+  namespace: crowe-platform
+  annotations:
+    iam.gke.io/gcp-service-account: vertex-ai-sa@PROJECT_ID.iam.gserviceaccount.com
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: crowe-logic-platform-hpa
+  namespace: crowe-platform
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: crowe-logic-platform
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: crowe-logic-platform
+  namespace: crowe-platform
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "crowe-platform-ip"
+    networking.gke.io/managed-certificates: "crowe-platform-cert"
+    ingress.gcp.kubernetes.io/pre-shared-cert: "crowe-platform-ssl"
+spec:
+  rules:
+  - host: crowe-platform.example.com
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: crowe-logic-platform
+            port:
+              number: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: crowe-platform-cert
+  namespace: crowe-platform
+spec:
+  domains:
+    - crowe-platform.example.com
+    - www.crowe-platform.example.com
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: crowe-logic-platform-pdb
+  namespace: crowe-platform
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: crowe-logic-platform
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: crowe-platform-network-policy
+  namespace: crowe-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: crowe-logic-platform
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: ingress-controller
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: cloud-sql-proxy
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6379  # Redis

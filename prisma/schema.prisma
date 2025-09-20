@@ -1,0 +1,886 @@
+// Crowe Logic Platform - Database Schema
+// This schema supports agriculture, mycology LIMS, and platform features
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== AUTHENTICATION & USERS ====================
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  username        String?   @unique
+  passwordHash    String?
+  firstName       String?
+  lastName        String?
+  name            String?   // Full name for OAuth
+  role            UserRole  @default(USER)
+  emailVerified   DateTime?
+  emailVerificationToken String? @unique
+  twoFactorEnabled Boolean  @default(false)
+  twoFactorSecret String?
+  avatar          String?
+  image           String?   // For OAuth profile images
+  metadata        Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastLoginAt     DateTime?
+
+  // NextAuth relations
+  accounts        Account[]
+  sessions        Session[]
+
+  // Application relations
+  apiKeys         ApiKey[]
+  auditLogs       AuditLog[]
+  farms           Farm[]
+  labSamples      LabSample[]
+  notifications   Notification[]
+  customer        Customer?
+  usageQuota      UsageQuota?
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  OPERATOR
+  USER
+  VIEWER
+}
+
+// NextAuth Session model
+model Session {
+  id            String   @id @default(cuid())
+  sessionToken  String   @unique
+  userId        String
+  expires       DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// NextAuth Account model for OAuth providers
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// NextAuth Verification Token model
+model VerificationToken {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ApiKey {
+  id            String   @id @default(uuid())
+  userId        String
+  name          String
+  key           String   @unique
+  permissions   String[]
+  lastUsedAt    DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([key])
+}
+
+// ==================== AGRICULTURE MODULE ====================
+
+model Farm {
+  id            String   @id @default(uuid())
+  name          String
+  ownerId       String
+  location      String?
+  coordinates   Json?    // GeoJSON
+  area          Float?   // hectares
+  certifications String[]
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  owner         User     @relation(fields: [ownerId], references: [id])
+  fields        Field[]
+  batches       Batch[]
+  equipment     Equipment[]
+  
+  @@index([ownerId])
+}
+
+model Field {
+  id            String   @id @default(uuid())
+  farmId        String
+  name          String
+  area          Float    // hectares
+  soilType      String?
+  polygon       Json?    // GeoJSON
+  status        FieldStatus @default(IDLE)
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  
+  farm          Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  crops         Crop[]
+  sensorReadings SensorReading[]
+  
+  @@index([farmId])
+}
+
+enum FieldStatus {
+  IDLE
+  PREPARING
+  PLANTED
+  GROWING
+  HARVESTING
+  FALLOW
+}
+
+model Crop {
+  id            String   @id @default(uuid())
+  fieldId       String
+  variety       String
+  plantingDate  DateTime
+  expectedHarvest DateTime?
+  actualHarvest DateTime?
+  status        CropStatus @default(PLANNED)
+  metadata      Json?
+  
+  field         Field    @relation(fields: [fieldId], references: [id])
+  batches       Batch[]
+  tasks         Task[]
+  
+  @@index([fieldId])
+  @@index([status])
+}
+
+enum CropStatus {
+  PLANNED
+  PLANTED
+  GROWING
+  HARVESTED
+  FAILED
+}
+
+model Batch {
+  id            String   @id @default(uuid())
+  farmId        String
+  cropId        String?
+  batchCode     String   @unique
+  plantingDate  DateTime?
+  harvestDate   DateTime?
+  quantity      Float?
+  unit          String?
+  status        BatchStatus @default(PLANNED)
+  notes         String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  farm          Farm     @relation(fields: [farmId], references: [id])
+  crop          Crop?    @relation(fields: [cropId], references: [id])
+  lots          Lot[]
+  inputs        Input[]
+  qcResults     QCResult[]
+  
+  @@index([farmId])
+  @@index([batchCode])
+  @@index([status])
+}
+
+enum BatchStatus {
+  PLANNED
+  ACTIVE
+  HARVESTED
+  PROCESSING
+  ARCHIVED
+}
+
+model Lot {
+  id            String   @id @default(uuid())
+  batchId       String
+  lotCode       String   @unique
+  quantity      Float
+  unit          String
+  qcStatus      QCStatus @default(PENDING)
+  location      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  
+  batch         Batch    @relation(fields: [batchId], references: [id])
+  shipments     Shipment[]
+  qcResults     QCResult[]
+  
+  @@index([batchId])
+  @@index([lotCode])
+}
+
+enum QCStatus {
+  PENDING
+  PASSED
+  FAILED
+  CONDITIONAL
+}
+
+model Input {
+  id            String   @id @default(uuid())
+  batchId       String
+  type          InputType
+  name          String
+  quantity      Float
+  unit          String
+  applicationDate DateTime
+  supplier      String?
+  certificationNumber String?
+  notes         String?
+  
+  batch         Batch    @relation(fields: [batchId], references: [id])
+  
+  @@index([batchId])
+  @@index([type])
+}
+
+enum InputType {
+  SEED
+  FERTILIZER
+  PESTICIDE
+  HERBICIDE
+  WATER
+  OTHER
+}
+
+model Shipment {
+  id            String   @id @default(uuid())
+  lotId         String
+  trackingNumber String  @unique
+  destination   String
+  carrier       String?
+  shippedAt     DateTime?
+  receivedAt    DateTime?
+  status        ShipmentStatus @default(PREPARING)
+  metadata      Json?
+  
+  lot           Lot      @relation(fields: [lotId], references: [id])
+  
+  @@index([lotId])
+  @@index([trackingNumber])
+}
+
+enum ShipmentStatus {
+  PREPARING
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
+  RETURNED
+}
+
+// ==================== MYCOLOGY LIMS MODULE ====================
+
+model Strain {
+  id            String   @id @default(uuid())
+  name          String
+  species       String
+  source        String?
+  genotype      String?
+  generation    Int      @default(0)
+  parentId      String?
+  characteristics Json?
+  storageLocation String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  parent        Strain?  @relation("StrainLineage", fields: [parentId], references: [id])
+  children      Strain[] @relation("StrainLineage")
+  cultures      Culture[]
+  inoculations  Inoculation[]
+  
+  @@index([species])
+}
+
+model Culture {
+  id            String   @id @default(uuid())
+  strainId      String
+  cultureCode   String   @unique
+  medium        String
+  container     String
+  status        CultureStatus @default(ACTIVE)
+  startDate     DateTime @default(now())
+  endDate       DateTime?
+  notes         String?
+  
+  strain        Strain   @relation(fields: [strainId], references: [id])
+  inoculations  Inoculation[]
+  assays        Assay[]
+  
+  @@index([strainId])
+  @@index([cultureCode])
+}
+
+enum CultureStatus {
+  ACTIVE
+  CONTAMINATED
+  EXHAUSTED
+  ARCHIVED
+}
+
+model Inoculation {
+  id            String   @id @default(uuid())
+  strainId      String
+  cultureId     String?
+  substrate     String
+  method        String
+  quantity      Float?
+  unit          String?
+  date          DateTime @default(now())
+  operator      String
+  successRate   Float?
+  notes         String?
+  
+  strain        Strain   @relation(fields: [strainId], references: [id])
+  culture       Culture? @relation(fields: [cultureId], references: [id])
+  incubations   Incubation[]
+  
+  @@index([strainId])
+}
+
+model Incubation {
+  id            String   @id @default(uuid())
+  inoculationId String
+  temperature   Float    // Celsius
+  humidity      Float    // Percentage
+  co2Level      Float?   // PPM
+  lightHours    Float?
+  startDate     DateTime @default(now())
+  endDate       DateTime?
+  status        IncubationStatus @default(ACTIVE)
+  notes         String?
+  
+  inoculation   Inoculation @relation(fields: [inoculationId], references: [id])
+  fruitings     Fruiting[]
+  
+  @@index([inoculationId])
+}
+
+enum IncubationStatus {
+  ACTIVE
+  COMPLETED
+  CONTAMINATED
+  FAILED
+}
+
+model Fruiting {
+  id            String   @id @default(uuid())
+  incubationId  String
+  flushNumber   Int      @default(1)
+  yieldWeight   Float?   // grams
+  quality       String?
+  harvestDate   DateTime?
+  notes         String?
+  
+  incubation    Incubation @relation(fields: [incubationId], references: [id])
+  
+  @@index([incubationId])
+}
+
+model LabSample {
+  id            String   @id @default(uuid())
+  sampleCode    String   @unique
+  type          SampleType
+  source        String
+  collectedBy   String
+  collectedAt   DateTime @default(now())
+  storageLocation String?
+  status        SampleStatus @default(PENDING)
+  metadata      Json?
+  
+  collector     User     @relation(fields: [collectedBy], references: [id])
+  assays        Assay[]
+  
+  @@index([sampleCode])
+  @@index([type])
+}
+
+enum SampleType {
+  TISSUE
+  SPORE
+  SUBSTRATE
+  WATER
+  AIR
+  SURFACE_SWAB
+}
+
+enum SampleStatus {
+  PENDING
+  IN_PROCESS
+  COMPLETED
+  DISCARDED
+}
+
+model Assay {
+  id            String   @id @default(uuid())
+  sampleId      String
+  cultureId     String?
+  type          AssayType
+  method        String?
+  result        Json
+  performedBy   String
+  performedAt   DateTime @default(now())
+  validatedBy   String?
+  validatedAt   DateTime?
+  status        AssayStatus @default(PENDING)
+  
+  sample        LabSample @relation(fields: [sampleId], references: [id])
+  culture       Culture? @relation(fields: [cultureId], references: [id])
+  
+  @@index([sampleId])
+  @@index([type])
+}
+
+enum AssayType {
+  PCR
+  MICROSCOPY
+  CULTURE
+  BIOCHEMICAL
+  CONTAMINATION
+  OTHER
+}
+
+enum AssayStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  INVALIDATED
+}
+
+// ==================== SHARED MODELS ====================
+
+model Task {
+  id            String   @id @default(uuid())
+  cropId        String?
+  title         String
+  description   String?
+  assignedTo    String?
+  priority      Priority @default(MEDIUM)
+  status        TaskStatus @default(PENDING)
+  dueDate       DateTime?
+  completedAt   DateTime?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  crop          Crop?    @relation(fields: [cropId], references: [id])
+  
+  @@index([status])
+  @@index([assignedTo])
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Equipment {
+  id            String   @id @default(uuid())
+  farmId        String
+  name          String
+  type          String
+  model         String?
+  serialNumber  String?
+  status        EquipmentStatus @default(OPERATIONAL)
+  lastMaintenance DateTime?
+  nextMaintenance DateTime?
+  notes         String?
+  
+  farm          Farm     @relation(fields: [farmId], references: [id])
+  
+  @@index([farmId])
+}
+
+enum EquipmentStatus {
+  OPERATIONAL
+  MAINTENANCE
+  REPAIR
+  RETIRED
+}
+
+model SensorReading {
+  id            String   @id @default(uuid())
+  fieldId       String
+  sensorType    String
+  value         Float
+  unit          String
+  timestamp     DateTime @default(now())
+  metadata      Json?
+  
+  field         Field    @relation(fields: [fieldId], references: [id])
+  
+  @@index([fieldId])
+  @@index([sensorType])
+  @@index([timestamp])
+}
+
+model QCResult {
+  id            String   @id @default(uuid())
+  batchId       String?
+  lotId         String?
+  testType      String
+  result        String
+  passed        Boolean
+  performedBy   String
+  performedAt   DateTime @default(now())
+  notes         String?
+  attachments   String[]
+  
+  batch         Batch?   @relation(fields: [batchId], references: [id])
+  lot           Lot?     @relation(fields: [lotId], references: [id])
+  
+  @@index([batchId])
+  @@index([lotId])
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  userId        String?
+  action        String
+  entity        String
+  entityId      String?
+  oldValue      Json?
+  newValue      Json?
+  ipAddress     String?
+  userAgent     String?
+  timestamp     DateTime @default(now())
+  
+  user          User?    @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
+  @@index([entity])
+  @@index([timestamp])
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  userId        String
+  type          NotificationType
+  title         String
+  message       String
+  priority      Priority @default(MEDIUM)
+  read          Boolean  @default(false)
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
+  @@index([read])
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  SUCCESS
+  TASK
+  ALERT
+}
+
+model SystemConfig {
+  id            String   @id @default(uuid())
+  key           String   @unique
+  value         Json
+  description   String?
+  updatedAt     DateTime @updatedAt
+  
+  @@index([key])
+}
+// Additional Prisma models for billing - Add these to your main schema.prisma file
+
+// ==================== BILLING & SUBSCRIPTIONS ====================
+
+model Customer {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  stripeCustomerId  String   @unique
+  email             String
+  name              String?
+  billingAddress    Json?    // Stripe address object
+  paymentMethod     String?  // Default payment method ID
+  currency          String   @default("usd")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions     Subscription[]
+  invoices          Invoice[]
+  usageRecords      UsageRecord[]
+  billingEvents     BillingEvent[]
+  
+  @@index([stripeCustomerId])
+  @@index([userId])
+}
+
+model Subscription {
+  id                    String   @id @default(uuid())
+  customerId            String
+  stripeSubscriptionId  String   @unique
+  stripePriceId         String
+  tier                  SubscriptionTier
+  status                SubscriptionStatus
+  currentPeriodStart    DateTime
+  currentPeriodEnd      DateTime
+  cancelAtPeriodEnd     Boolean  @default(false)
+  canceledAt            DateTime?
+  trialStart            DateTime?
+  trialEnd              DateTime?
+  metadata              Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  // Relations
+  customer              Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  addOns                SubscriptionAddOn[]
+  usageRecords          UsageRecord[]
+  
+  @@index([stripeSubscriptionId])
+  @@index([customerId])
+  @@index([status])
+}
+
+enum SubscriptionTier {
+  FREE
+  DEVELOPER
+  TEAM
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  UNPAID
+  PAUSED
+}
+
+model SubscriptionAddOn {
+  id                String   @id @default(uuid())
+  subscriptionId    String
+  addOnId           String   // agriculture, mycology, ai_training, etc.
+  stripePriceId     String
+  quantity          Int      @default(1)
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  
+  @@index([subscriptionId])
+  @@unique([subscriptionId, addOnId])
+}
+
+model UsageRecord {
+  id                String   @id @default(uuid())
+  customerId        String
+  subscriptionId    String?
+  type              UsageType
+  quantity          Int
+  unitPrice         Float?   // Price per unit if applicable
+  totalCost         Float?   // Total cost if applicable
+  timestamp         DateTime @default(now())
+  description       String?
+  metadata          Json?
+  
+  // Relations
+  customer          Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  subscription      Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  
+  @@index([customerId])
+  @@index([subscriptionId])
+  @@index([type])
+  @@index([timestamp])
+}
+
+enum UsageType {
+  AI_REQUEST
+  FILE_STORAGE
+  BUILD_MINUTES
+  TERMINAL_MINUTES
+  API_CALL
+  COLLABORATOR_SEAT
+  CUSTOM_DOMAIN
+  BANDWIDTH
+}
+
+model Invoice {
+  id                String   @id @default(uuid())
+  customerId        String
+  stripeInvoiceId   String   @unique
+  invoiceNumber     String?
+  status            InvoiceStatus
+  amount            Int      // Amount in cents
+  currency          String   @default("usd")
+  paid              Boolean  @default(false)
+  paidAt            DateTime?
+  dueDate           DateTime?
+  billingPeriodStart DateTime
+  billingPeriodEnd   DateTime
+  hostedInvoiceUrl  String?
+  invoicePdf        String?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  customer          Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  @@index([stripeInvoiceId])
+  @@index([customerId])
+  @@index([status])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  UNCOLLECTIBLE
+  VOID
+}
+
+model BillingEvent {
+  id                String   @id @default(uuid())
+  customerId        String
+  type              BillingEventType
+  description       String
+  amount            Float?
+  metadata          Json?
+  stripeEventId     String?  @unique
+  processedAt       DateTime?
+  createdAt         DateTime @default(now())
+  
+  // Relations
+  customer          Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  @@index([customerId])
+  @@index([type])
+  @@index([stripeEventId])
+}
+
+enum BillingEventType {
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_UPDATED
+  SUBSCRIPTION_CANCELED
+  SUBSCRIPTION_RENEWED
+  PAYMENT_SUCCEEDED
+  PAYMENT_FAILED
+  INVOICE_CREATED
+  INVOICE_PAID
+  INVOICE_PAYMENT_FAILED
+  TRIAL_STARTED
+  TRIAL_ENDING
+  TRIAL_ENDED
+  USAGE_RECORD_CREATED
+  CREDIT_APPLIED
+  REFUND_ISSUED
+}
+
+model PromoCode {
+  id                String   @id @default(uuid())
+  code              String   @unique
+  description       String?
+  discountType      DiscountType
+  discountValue     Float    // Percentage or fixed amount
+  applicableTiers   String[] // Array of tier IDs
+  maxUses           Int?
+  currentUses       Int      @default(0)
+  validFrom         DateTime @default(now())
+  validUntil        DateTime
+  stripePromotionId String?
+  active            Boolean  @default(true)
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([code])
+  @@index([active])
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+model UsageQuota {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  tier              SubscriptionTier
+  
+  // Current usage counts (reset monthly)
+  aiRequestsUsed    Int      @default(0)
+  storageUsedGB     Float    @default(0)
+  buildMinutesUsed  Int      @default(0)
+  terminalMinutesUsed Int    @default(0)
+  apiCallsUsed      Int      @default(0)
+  
+  // Limits (from subscription tier + add-ons)
+  aiRequestsLimit   Int
+  storageLimitGB    Float
+  buildMinutesLimit Int
+  terminalMinutesLimit Int
+  apiCallsLimit     Int
+  collaboratorsLimit Int
+  privateReposLimit Int
+  customDomainsLimit Int
+  
+  // Reset tracking
+  lastResetAt       DateTime @default(now())
+  nextResetAt       DateTime
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}

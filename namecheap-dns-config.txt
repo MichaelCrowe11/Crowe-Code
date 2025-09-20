@@ -1,0 +1,44 @@
+NAMECHEAP DNS CONFIGURATION FOR RAILWAY
+========================================
+
+1. DELETE these records (your current VPS setup):
+   - A Record: @ → 159.198.37.197
+   - A Record: www → 159.198.37.197
+
+2. ADD these NEW records:
+
+   RECORD 1:
+   ---------
+   Type: CNAME
+   Host: @
+   Value: [YOUR-RAILWAY-DOMAIN].up.railway.app
+   TTL: Automatic
+
+   RECORD 2:
+   ---------
+   Type: CNAME
+   Host: www
+   Value: [YOUR-RAILWAY-DOMAIN].up.railway.app
+   TTL: Automatic
+
+   KEEP this record (for email):
+   -----------------------------
+   Type: TXT
+   Host: @
+   Value: v=spf1 include:spf.efwd.registrar-servers.com ~all
+   TTL: Automatic
+
+EXAMPLE:
+--------
+If your Railway domain is: my-app-production-xyz123.up.railway.app
+
+Then in Namecheap add:
+- CNAME @ → my-app-production-xyz123.up.railway.app
+- CNAME www → my-app-production-xyz123.up.railway.app
+
+IMPORTANT:
+----------
+- DNS propagation takes 1-48 hours (usually 1-4 hours)
+- Your Railway app must be deployed and running
+- Custom domains must be added in Railway dashboard first
+- SSL certificates are automatic once DNS propagates

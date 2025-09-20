@@ -1,0 +1,157 @@
+# Render Blueprint for Crowe Logic Platform
+# Deploy with: https://dashboard.render.com/blueprints
+
+services:
+  # Main application
+  - type: web
+    name: crowe-logic-platform
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    
+    # Instance configuration
+    plan: standard  # starter | standard | pro
+    region: oregon  # oregon | ohio | virginia | frankfurt | singapore
+    
+    # Scaling
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetMemoryPercent: 80
+      targetCPUPercent: 70
+    
+    # Health check
+    healthCheckPath: /api/health
+    
+    # Environment variables
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NEXT_PUBLIC_APP_URL
+        fromService:
+          type: web
+          name: crowe-logic-platform
+          property: hostport
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crowe-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: crowe-cache
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Set manually in dashboard
+      
+      # Feature flags
+      - key: ENABLE_QUANTUM_MODULE
+        value: true
+      - key: ENABLE_ML_LAB
+        value: true
+      - key: ENABLE_AGRICULTURE
+        value: true
+      - key: ENABLE_MYCOLOGY_LIMS
+        value: true
+      - key: ENABLE_VOICE_ASSISTANT
+        value: true
+    
+    # Build & deploy settings
+    buildCommand: npm run build
+    startCommand: npm start
+    
+    # Auto-deploy from GitHub
+    autoDeploy: true
+    
+    # Disk storage for uploads
+    disk:
+      name: uploads
+      mountPath: /data
+      sizeGB: 1
+
+  # Background worker (optional)
+  - type: worker
+    name: crowe-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crowe-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: crowe-cache
+          property: connectionString
+    
+    startCommand: npm run worker
+    autoDeploy: true
+
+# Databases
+databases:
+  # PostgreSQL database
+  - name: crowe-db
+    plan: standard  # starter | standard | pro
+    region: oregon
+    databaseName: crowe_platform
+    user: crowe_admin
+    
+    # Backup settings
+    ipAllowList: []  # Leave empty for public access
+    
+# Redis cache
+services:
+  - type: redis
+    name: crowe-cache
+    plan: standard  # starter | standard | pro
+    region: oregon
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
+# Cron jobs
+services:
+  - type: cron
+    name: backup-job
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    schedule: "0 2 * * *"  # Daily at 2 AM
+    command: ./scripts/backup.sh
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crowe-db
+          property: connectionString
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: BACKUP_S3_BUCKET
+        value: crowe-backups
+        
+  - type: cron
+    name: health-check
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    schedule: "*/5 * * * *"  # Every 5 minutes
+    command: ./scripts/health-check.sh
+    envVars:
+      - key: API_URL
+        fromService:
+          type: web
+          name: crowe-logic-platform
+          property: hostport
+      - key: SLACK_WEBHOOK_URL
+        sync: false

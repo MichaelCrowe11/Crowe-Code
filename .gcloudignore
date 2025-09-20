@@ -1,0 +1,93 @@
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud. It follows the same syntax as .gitignore, with the addition of
+# "#!include" directives (which insert the entries of the given .gitignore-style
+# file at that point).
+#
+# For more information, run:
+#   $ gcloud topic gcloudignore
+#
+.gcloudignore
+# If you would like to upload your .git directory, .gitignore file or files
+# from your .gitignore file, remove the corresponding line
+# below:
+.git
+.gitignore
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Next.js build output
+.next/
+out/
+
+# Testing
+coverage/
+.nyc_output/
+tests/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Development files
+.env.local
+.env.development
+.env*.local
+*.log
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation (not needed for deployment)
+*.md
+!README.md
+docs/
+
+# Scripts (except deployment ones)
+scripts/*.sh
+!scripts/docker-entrypoint.sh
+
+# Terraform files (not needed in container)
+gcp-deploy/terraform/
+*.tf
+*.tfvars
+*.tfstate*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts not needed
+dist/
+build/
+
+# Local keys (should use Secret Manager instead)
+*.pem
+*.key
+vertex-ai-key.json
+
+# Development tools
+.eslintrc*
+.prettierrc*
+playwright.config.ts
+vitest.config.ts
+jest.config.js
+
+# Git files
+.github/
+.husky/
+
+# Other unnecessary files
+oracle-docker-setup.bat
+open-env-file.bat
+fly.toml
+railway.json
+render.yaml
+vercel.json
