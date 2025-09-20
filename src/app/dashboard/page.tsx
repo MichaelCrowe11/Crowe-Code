@@ -37,6 +37,8 @@ import CroweLogicLogo from "@/components/branding/CroweLogicLogo";
 import { CroweLogicBadge } from "@/components/branding/CroweLogicBranding";
 import Link from "next/link";
 import AIChatInterface from "@/components/ai/AIChatInterface";
+import QuantumCodeEngine from "@/components/ai/QuantumCodeEngine";
+import HyperCollabWorkspace from "@/components/collaboration/HyperCollabWorkspace";
 
 // Mock data - will be replaced with real API calls
 const mockStats = {
@@ -63,7 +65,7 @@ const mockProjects = [
 
 function DashboardContent() {
   const { data: session, status } = useSession();
-  const [activeTab, setActiveTab] = useState<"overview" | "ai" | "profile" | "apikeys" | "usage" | "billing" | "projects">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "ai" | "quantum" | "collaboration" | "profile" | "apikeys" | "usage" | "billing" | "projects">("overview");
   const [showNewKeyModal, setShowNewKeyModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [generatedKey, setGeneratedKey] = useState("");
@@ -158,6 +160,24 @@ function DashboardContent() {
                   AI Assistant
                 </button>
                 <button
+                  onClick={() => setActiveTab("quantum")}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    activeTab === "quantum" ? "bg-purple-500/20 text-purple-400" : "text-white/60 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <Brain className="h-4 w-4" />
+                  Quantum Engine
+                </button>
+                <button
+                  onClick={() => setActiveTab("collaboration")}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    activeTab === "collaboration" ? "bg-green-500/20 text-green-400" : "text-white/60 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <Users className="h-4 w-4" />
+                  HyperCollab
+                </button>
+                <button
                   onClick={() => setActiveTab("profile")}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                     activeTab === "profile" ? "bg-blue-500/20 text-blue-400" : "text-white/60 hover:bg-white/5 hover:text-white"
@@ -222,6 +242,18 @@ function DashboardContent() {
             {activeTab === "ai" && (
               <div className="h-[calc(100vh-200px)]">
                 <AIChatInterface />
+              </div>
+            )}
+
+            {activeTab === "quantum" && (
+              <div className="h-[calc(100vh-200px)]">
+                <QuantumCodeEngine />
+              </div>
+            )}
+
+            {activeTab === "collaboration" && (
+              <div className="h-[calc(100vh-200px)]">
+                <HyperCollabWorkspace />
               </div>
             )}
 
