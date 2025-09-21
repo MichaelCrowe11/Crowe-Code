@@ -76,13 +76,15 @@ export default function OAuthTestPage() {
       const contentType = response.headers.get("content-type");
       const isJson = contentType?.includes("application/json");
 
+      const data = isJson ? await response.json() : await response.text();
+
       setTestResults((prev: any) => ({
         ...prev,
         [endpoint]: {
           status: response.status,
           ok: response.ok,
           contentType,
-          data: isJson ? await response.json() : await response.text(),
+          data: data,
         },
       }));
     } catch (err: any) {
