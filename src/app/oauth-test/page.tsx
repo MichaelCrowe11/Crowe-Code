@@ -34,7 +34,7 @@ interface DebugInfo {
   recommendations: string[];
 }
 
-export default function OAuthTestPage() {
+function OAuthTestPageContent() {
   const { data: session, status, update } = useSession();
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [providers, setProviders] = useState<any>(null);
@@ -488,3 +488,20 @@ export default function OAuthTestPage() {
     </div>
   );
 }
+
+// Wrap in dynamic to prevent SSR issues
+import dynamic from "next/dynamic";
+
+const OAuthTestPage = dynamic(() => Promise.resolve(OAuthTestPageContent), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-blue-950/20 to-purple-950/20 p-8 flex items-center justify-center">
+      <div className="flex items-center gap-3">
+        <RefreshCw className="h-5 h-5 animate-spin text-blue-400" />
+        <span className="text-white/60">Loading OAuth test...</span>
+      </div>
+    </div>
+  )
+});
+
+export default OAuthTestPage;
