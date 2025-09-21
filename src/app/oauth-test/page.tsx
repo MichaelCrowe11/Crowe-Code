@@ -490,9 +490,6 @@ function OAuthTestPageContent() {
   );
 }
 
-// Wrap in dynamic to prevent SSR issues
-import dynamic from "next/dynamic";
-
 const OAuthTestPage = dynamic(() => Promise.resolve(OAuthTestPageContent), {
   ssr: false,
   loading: () => (
