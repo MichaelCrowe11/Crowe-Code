@@ -1,8 +1,8 @@
-# Crowe Logic Platform API Documentation
+# CroweCode API Documentation
 
 ## Base URL
 - Development: `http://localhost:5000/api`
-- Production: `https://app.crowelogic.com/api`
+- Production: `https://api.crowecode.com`
 
 ## Authentication
 All protected endpoints require JWT authentication via HTTP-only cookie (`auth_token`).
@@ -469,7 +469,7 @@ POST /api/payments/webhook
 ### Real-time monitoring
 ```javascript
 ws://localhost:5000/ws
-// or wss://app.crowelogic.com/ws
+// or wss://api.crowecode.com/ws
 
 Events:
 - batch.update

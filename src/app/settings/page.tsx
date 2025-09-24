@@ -210,10 +210,10 @@ export default function SettingsPage() {
                 
                 <div className="space-y-3 mb-6">
                   {[
-                    { name: 'Admin User', email: 'admin@crowelogic.com', role: 'Administrator', status: 'active' },
-                    { name: 'Lab Tech 1', email: 'lab1@crowelogic.com', role: 'Lab Technician', status: 'active' },
-                    { name: 'Lab Tech 2', email: 'lab2@crowelogic.com', role: 'Lab Technician', status: 'active' },
-                    { name: 'Production Manager', email: 'prod@crowelogic.com', role: 'Manager', status: 'active' }
+                    { name: 'Admin User', email: 'admin@crowecode.com', role: 'Administrator', status: 'active' },
+                    { name: 'Lab Tech 1', email: 'lab1@crowecode.com', role: 'Lab Technician', status: 'active' },
+                    { name: 'Lab Tech 2', email: 'lab2@crowecode.com', role: 'Lab Technician', status: 'active' },
+                    { name: 'Production Manager', email: 'prod@crowecode.com', role: 'Manager', status: 'active' }
                   ].map((user, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                       <div>

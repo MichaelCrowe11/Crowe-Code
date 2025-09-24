@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { anthropic } from '@/lib/ai-provider';
+import logger from '../../../../lib/logger';
 
 // Rate limiting (simple in-memory implementation)
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ suggestions });
 
   } catch (error) {
-    console.error('AI suggestions error:', error);
+    logger.error('AI suggestions error:', error);
     return NextResponse.json(
       { error: 'Failed to generate suggestions' },
       { status: 500 }
@@ -150,7 +151,7 @@ Suggestions:`;
     return getDefaultSuggestions(language, currentLine);
 
   } catch (error) {
-    console.error('Anthropic API error:', error);
+    logger.error('Anthropic API error:', error);
     return getDefaultSuggestions(language, currentLine);
   }
 }
@@ -278,7 +279,7 @@ function detectCodePattern(context: string, currentLine: string): string {
 function getDefaultSuggestions(language: string, currentLine: string): string[] {
   const defaultSuggestions: { [key: string]: string[] } = {
     'javascript': [
-      'console.log()',
+      'logger.info()',
       'const result = ',
       'function getName() {',
       'return ',

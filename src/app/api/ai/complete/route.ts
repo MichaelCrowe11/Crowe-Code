@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth/nextauth-config";
 import { generateCode, generateCompletion } from "@/lib/ai-provider";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import logger from '../../../../lib/logger';
 
 const completionSchema = z.object({
   code: z.string(),
@@ -178,7 +179,7 @@ Return ONLY the completion text that should be inserted at the cursor position, 
       );
     }
 
-    console.error("Error generating completion:", error);
+    logger.error("Error generating completion:", error);
     return NextResponse.json(
       { error: "Failed to generate completion" },
       { status: 500 }

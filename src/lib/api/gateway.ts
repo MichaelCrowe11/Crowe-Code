@@ -12,6 +12,7 @@ import { croweCodeCollaboration } from '../collaboration/real-time-collaboration
 import { croweCodePipelineManager } from '../ci-cd/pipeline-integration';
 import { croweCodeAnalysisEngine } from '../analysis/code-analysis-engine';
 import { croweCodeDeploymentManager } from '../deployment/deployment-manager';
+import logger from '../logger';
 
 export interface APIRequest {
   id: string;
@@ -676,7 +677,7 @@ class CroweCodeAPIGateway {
       }
     });
 
-    console.log(`Registered ${this.routes.size} API routes`);
+    logger.info(`Registered ${this.routes.size} API routes`);
   }
 
   private addRoute(config: RouteConfig): void {
@@ -875,7 +876,7 @@ class CroweCodeAPIGateway {
       return ctx.response;
 
     } catch (error) {
-      console.error('API request error:', error);
+      logger.error('API request error:', error);
       return this.createErrorResponse(500, 'Internal server error');
     }
   }
@@ -926,7 +927,7 @@ class CroweCodeAPIGateway {
       };
 
     } catch (error) {
-      console.error(`Route handler error for ${route.path}:`, error);
+      logger.error(`Route handler error for ${route.path}:`, error);
       return this.createErrorResponse(500, error instanceof Error ? error.message : 'Unknown error');
     }
   }
@@ -1071,7 +1072,7 @@ class CroweCodeAPIGateway {
       }
     }, 300000); // Every 5 minutes
 
-    console.log('API Gateway cleanup tasks started');
+    logger.info('API Gateway cleanup tasks started');
   }
 
   /**
@@ -1369,7 +1370,7 @@ class RequestValidator {
 
 class APILogger {
   logRequest(request: APIRequest, response: APIResponse, duration: number): void {
-    console.log(`${request.method} ${request.path} ${response.status} ${duration}ms`);
+    logger.info(`${request.method} ${request.path} ${response.status} ${duration}ms`);
   }
 }
 

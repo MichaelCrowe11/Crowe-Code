@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Shield, AlertTriangle, Zap, CheckCircle, XCircle, Info, GitBranch, Clock, TrendingUp, Code, FileCode, Brain, Sparkles, Search, Filter, Download, RefreshCw, ChevronRight, Bug, Lock, Gauge, BookOpen, Award } from 'lucide-react';
+import logger from '../../lib/logger';
 
 interface CodeIssue {
   id: string;
@@ -95,7 +96,7 @@ const mockIssues: CodeIssue[] = [
     message: 'Missing error handling in async function',
     suggestion: 'Wrap async operations in try-catch blocks',
     codeSnippet: 'const data = await fetch(url);',
-    fixSnippet: 'try { const data = await fetch(url); } catch (error) { console.error("API Error:", error); }',
+    fixSnippet: 'try { const data = await fetch(url); } catch (error) { logger.error("API Error:", error); }',
     confidence: 0.75,
     category: 'Error Handling'
   },

@@ -17,7 +17,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'croweos.com',
+        hostname: 'www.crowecode.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'crowecode.com',
       },
       {
         protocol: 'http',

@@ -145,7 +145,7 @@ export default function SubstrateMatrixPage() {
             <div className="relative h-10 w-10 rounded-xl overflow-hidden bg-white/10">
               <Image
                 src="/crowe-avatar.png"
-                alt="Crowe Logic Avatar"
+                alt="CroweCode Avatar"
                 width={40}
                 height={40}
                 className="object-cover"

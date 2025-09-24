@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import logger from '../lib/logger';
 import { 
   GitBranch, 
   GitCommit, 
@@ -81,7 +82,7 @@ export default function GitPanel({ onFileSelect }: GitPanelProps) {
         }
       }
     } catch (error) {
-      console.error('Failed to load git status:', error);
+      logger.error('Failed to load git status:', error);
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +97,7 @@ export default function GitPanel({ onFileSelect }: GitPanelProps) {
         setDiffContent(prev => ({ ...prev, [file]: data.output || 'No changes' }));
       }
     } catch (error) {
-      console.error('Failed to load diff:', error);
+      logger.error('Failed to load diff:', error);
     }
   };
 
@@ -162,7 +163,7 @@ export default function GitPanel({ onFileSelect }: GitPanelProps) {
         }
       }
     } catch (error) {
-      console.error('Commit failed:', error);
+      logger.error('Commit failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -178,7 +179,7 @@ export default function GitPanel({ onFileSelect }: GitPanelProps) {
       });
       await loadGitStatus();
     } catch (error) {
-      console.error('Push failed:', error);
+      logger.error('Push failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -194,7 +195,7 @@ export default function GitPanel({ onFileSelect }: GitPanelProps) {
       });
       await loadGitStatus();
     } catch (error) {
-      console.error('Pull failed:', error);
+      logger.error('Pull failed:', error);
     } finally {
       setIsLoading(false);
     }

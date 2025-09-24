@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Redis } from 'ioredis';
 import crypto from 'crypto';
+import logger from '../lib/logger';
 
 // Initialize Redis client
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
@@ -174,7 +175,7 @@ export async function cacheMiddleware(
       return response;
     }
   } catch (error) {
-    console.error('Cache read error:', error);
+    logger.error('Cache read error:', error);
     // Continue without cache on error
   }
   
@@ -217,7 +218,7 @@ export async function cacheMiddleware(
         }
       });
     } catch (error) {
-      console.error('Cache write error:', error);
+      logger.error('Cache write error:', error);
       // Return original response on cache error
       return response;
     }
@@ -250,7 +251,7 @@ export async function invalidateCache(pattern: string | RegExp): Promise<number>
     
     return keysToDelete.length;
   } catch (error) {
-    console.error('Cache invalidation error:', error);
+    logger.error('Cache invalidation error:', error);
     return 0;
   }
 }
@@ -267,20 +268,20 @@ export async function warmupCache(baseUrl: string) {
     '/api/health'
   ];
   
-  console.log('Warming up cache...');
+  logger.info('Warming up cache...');
   
   for (const route of criticalRoutes) {
     try {
       const response = await fetch(`${baseUrl}${route}`);
       if (response.ok) {
-        console.log(`✓ Cached: ${route}`);
+        logger.info(`✓ Cached: ${route}`);
       }
     } catch (error) {
-      console.error(`✗ Failed to cache ${route}:`, error);
+      logger.error(`✗ Failed to cache ${route}:`, error);
     }
   }
   
-  console.log('Cache warmup complete');
+  logger.info('Cache warmup complete');
 }
 
 /**
@@ -314,7 +315,7 @@ export async function getCacheStats(): Promise<{
       hitRate: Math.round(hitRate * 100) / 100
     };
   } catch (error) {
-    console.error('Failed to get cache stats:', error);
+    logger.error('Failed to get cache stats:', error);
     return {
       keys: 0,
       memory: '0',
@@ -352,7 +353,7 @@ export function withCache(ttl: number = 300) {
           });
         }
       } catch (error) {
-        console.error('Cache error:', error);
+        logger.error('Cache error:', error);
       }
       
       // Call original method
@@ -364,7 +365,7 @@ export function withCache(ttl: number = 300) {
           const data = await result.json();
           await redis.setex(cacheKey, ttl, JSON.stringify(data));
         } catch (error) {
-          console.error('Cache write error:', error);
+          logger.error('Cache write error:', error);
         }
       }
       

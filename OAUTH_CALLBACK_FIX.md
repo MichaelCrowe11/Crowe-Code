@@ -1,4 +1,4 @@
-# 🔴 URGENT: OAuth Callback URL Configuration Fix
+1# 🔴 URGENT: OAuth Callback URL Configuration Fix
 
 ## The Problem
 You're getting a "Callback" error because the OAuth callback URLs in your GitHub and Google apps don't match what NextAuth is using.
@@ -39,22 +39,72 @@ https://crowecode-main.fly.dev/api/auth/callback/github
 https://crowecode-main.fly.dev/api/auth/callback/google
 ```
 
+## Environment-specific URIs (GitHub + Google)
+
+Use these exact values in your OAuth apps. Pick the set that matches where you’re logging in.
+
+### Staging (Fly.io) — crowecode-main.fly.dev
+
+- GitHub Authorization callback URL:
+   - `https://crowecode-main.fly.dev/api/auth/callback/github`
+
+- Google Authorized JavaScript origins:
+   - `https://crowecode-main.fly.dev`
+
+- Google Authorized redirect URIs:
+   - `https://crowecode-main.fly.dev/api/auth/callback/google`
+
+Set your app URL for staging so cookies/session match the host:
+
+```bash
+flyctl secrets set \
+   NEXTAUTH_URL="https://crowecode-main.fly.dev" \
+   --app crowecode-main
+```
+
+### Production — crowecode.com (www)
+
+- GitHub Authorization callback URLs (set both if you’ll ever use apex and www):
+   - `https://www.crowecode.com/api/auth/callback/github`
+   - `https://crowecode.com/api/auth/callback/github`
+
+- Google Authorized JavaScript origins:
+   - `https://www.crowecode.com`
+   - `https://crowecode.com`
+
+- Google Authorized redirect URIs:
+   - `https://www.crowecode.com/api/auth/callback/google`
+   - `https://crowecode.com/api/auth/callback/google`
+
+If production also runs on Fly for this app, set:
+
+```bash
+flyctl secrets set \
+   NEXTAUTH_URL="https://www.crowecode.com" \
+   --app crowecode-main
+```
+
+If production runs elsewhere (VPS/Docker), set `NEXTAUTH_URL=https://www.crowecode.com` in that environment.
+
 ## Common Mistakes to Avoid
 
 ❌ DON'T use these incorrect URLs:
+
 - `https://crowecode-main.fly.dev/auth/callback/github` (missing /api)
 - `https://crowecode-main.fly.dev/callback/github` (missing /api/auth)
 - `http://crowecode-main.fly.dev/api/auth/callback/github` (http instead of https)
 - `https://www.crowecode-main.fly.dev/api/auth/callback/github` (has www)
 
 ✅ DO use exactly:
+
 - `https://crowecode-main.fly.dev/api/auth/callback/github`
 - `https://crowecode-main.fly.dev/api/auth/callback/google`
 
 ## Step-by-Step Fix
 
 ### 1. Update GitHub OAuth App
-```
+
+```text
 1. Visit: https://github.com/settings/developers
 2. Click on your OAuth App
 3. Update Authorization callback URL to:
@@ -63,7 +113,8 @@ https://crowecode-main.fly.dev/api/auth/callback/google
 ```
 
 ### 2. Update Google OAuth Client
-```
+
+```text
 1. Visit: https://console.cloud.google.com/apis/credentials
 2. Click on your OAuth 2.0 Client ID
 3. Add to Authorized redirect URIs:
@@ -72,28 +123,35 @@ https://crowecode-main.fly.dev/api/auth/callback/google
 ```
 
 ### 3. Verify Environment Variables
+
 Run this command to ensure your OAuth credentials are set:
+
 ```bash
 fly secrets list --app crowecode-main | grep -E "(GITHUB|GOOGLE)"
 ```
 
 You should see:
+
 - GITHUB_CLIENT_ID
 - GITHUB_CLIENT_SECRET
 - GOOGLE_CLIENT_ID
 - GOOGLE_CLIENT_SECRET
 
 ### 4. Test the Login
+
 After updating the callback URLs:
-1. Clear your browser cookies for crowecode-main.fly.dev
-2. Visit: https://crowecode-main.fly.dev/login
+
+1. Clear your browser cookies for `crowecode-main.fly.dev`
+2. Visit: `https://crowecode-main.fly.dev/login`
 3. Click GitHub or Google login
 4. You should be redirected to the OAuth provider
-5. After authorizing, you should return to /dashboard
+5. After authorizing, you should return to `/dashboard`
 
 ## If It Still Doesn't Work
 
+
 ### Check 1: Verify the Exact Error
+
 The URL shows `error=Callback` which means NextAuth received an error from the OAuth provider. Common causes:
 
 1. **Mismatched callback URL** (most likely)
@@ -103,16 +161,19 @@ The URL shows `error=Callback` which means NextAuth received an error from the O
 ### Check 2: Verify Your OAuth App Settings
 
 For GitHub:
+
 - Make sure the app is not suspended
 - Verify the Client ID matches what's in Fly secrets
 - The callback URL has no trailing slash
 
 For Google:
+
 - Make sure the OAuth consent screen is configured
 - The app is not in "Testing" mode with restricted users
 - The redirect URI is in the approved list
 
 ### Check 3: Debug with Logs
+
 ```bash
 fly logs --app crowecode-main | grep -i "oauth\|callback\|auth"
 ```
@@ -122,12 +183,14 @@ fly logs --app crowecode-main | grep -i "oauth\|callback\|auth"
 After fixing, test these directly:
 
 1. GitHub OAuth:
-   ```
+
+   ```text
    https://github.com/login/oauth/authorize?client_id=YOUR_GITHUB_CLIENT_ID&redirect_uri=https://crowecode-main.fly.dev/api/auth/callback/github
    ```
 
 2. Google OAuth:
-   ```
+
+   ```text
    https://accounts.google.com/o/oauth2/v2/auth?client_id=YOUR_GOOGLE_CLIENT_ID&redirect_uri=https://crowecode-main.fly.dev/api/auth/callback/google&response_type=code&scope=openid%20email%20profile
    ```
 
@@ -146,12 +209,14 @@ After fixing, test these directly:
 If you need to create new OAuth apps:
 
 ### New GitHub OAuth App
+
 ```bash
 # After creating new app on GitHub, update secrets:
 fly secrets set GITHUB_CLIENT_ID="new_client_id" GITHUB_CLIENT_SECRET="new_secret" --app crowecode-main
 ```
 
 ### New Google OAuth Client
+
 ```bash
 # After creating new client on Google Cloud Console:
 fly secrets set GOOGLE_CLIENT_ID="new_client_id" GOOGLE_CLIENT_SECRET="new_secret" --app crowecode-main

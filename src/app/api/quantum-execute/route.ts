@@ -6,6 +6,7 @@ import vm from "vm";
 import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import logger from '../../../lib/logger';
 
 interface ExecutionContext {
   console: {
@@ -163,7 +164,7 @@ class QuantumCodeExecutor {
 
       return analysis;
     } catch (error) {
-      console.error('AI analysis failed:', error);
+      logger.error('AI analysis failed:', error);
       return {
         security: 70,
         performance: 70,
@@ -199,13 +200,13 @@ class QuantumCodeExecutor {
             if (typeof main === 'function') {
               const result = main();
               if (result instanceof Promise) {
-                result.then(r => console.log('Result:', r)).catch(e => console.error('Error:', e));
+                result.then(r => logger.info('Result:', r)).catch(e => logger.error('Error:', e));
               } else {
-                console.log('Result:', result);
+                logger.info('Result:', result);
               }
             }
           } catch (error) {
-            console.error('Execution Error:', error.message);
+            logger.error('Execution Error:', error.message);
           }
         })();
       `;
@@ -321,12 +322,12 @@ export async function POST(request: NextRequest) {
     const result = await executor.execute(code, language, 15000);
 
     // Log execution for analytics
-    console.log(`Quantum execution by ${userId}: ${result.success ? 'SUCCESS' : 'FAILED'} (${result.duration}ms)`);
+    logger.info(`Quantum execution by ${userId}: ${result.success ? 'SUCCESS' : 'FAILED'} (${result.duration}ms)`);
 
     return NextResponse.json(result);
 
   } catch (error: any) {
-    console.error("Quantum execution error:", error);
+    logger.error("Quantum execution error:", error);
 
     return NextResponse.json(
       {

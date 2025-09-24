@@ -1,6 +1,7 @@
 // src/lib/withAuth.ts - Route-level authentication helper
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import logger from './logger';
 
 export type AuthenticatedUser = {
   id: string;
@@ -91,7 +92,7 @@ export function withAuth(handler: AuthenticatedHandler, options?: {
       return await handler(authenticatedReq);
 
     } catch (error) {
-      console.error('Authentication error:', error);
+      logger.error('Authentication error:', error);
       return NextResponse.json(
         { 
           error: 'Authentication failed',
@@ -123,7 +124,7 @@ export async function verifyTokenDirect(token: string): Promise<AuthenticatedUse
       emailVerified: payload.emailVerified as boolean || false,
     };
   } catch (error) {
-    console.error('Direct token verification failed:', error);
+    logger.error('Direct token verification failed:', error);
     return null;
   }
 }

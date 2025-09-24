@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, Play, Pause, RotateCcw, Zap, Brain, Code, Terminal, MessageSquare, Settings, HelpCircle, ChevronRight, CheckCircle, XCircle, AlertCircle, Loader2, Sparkles, Headphones, Activity } from 'lucide-react';
+import logger from '../../lib/logger';
 
 interface VoiceCommand {
   id: string;
@@ -107,7 +108,7 @@ export default function VoiceControlledCoding() {
         };
 
         recognition.onerror = (event: any) => {
-          console.error('Speech recognition error:', event.error);
+          logger.error('Speech recognition error:', event.error);
           setIsListening(false);
         };
 
@@ -193,7 +194,7 @@ export default function VoiceControlledCoding() {
       WRITE_LOOP: {
         language: 'javascript',
         code: `for (let i = 0; i < 10; i++) {
-  console.log(i);
+  logger.info(i);
 }`,
         description: 'a for loop'
       },
@@ -295,7 +296,7 @@ export default function VoiceControlledCoding() {
       };
       updateAudioLevel();
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      logger.error('Error accessing microphone:', error);
     }
   };
 

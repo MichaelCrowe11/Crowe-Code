@@ -6,6 +6,7 @@
 
 import { Socket } from 'socket.io';
 import { croweCodeAutonomousAgent } from '../ai/autonomous-agent';
+import logger from '../logger';
 
 export interface CollaborationSession {
   id: string;
@@ -307,7 +308,7 @@ class CroweCodeCollaborationEngine {
     // Create voice room
     this.voiceRooms.set(sessionId, new VoiceRoom(sessionId));
 
-    console.log(`Collaboration session created: ${sessionId}`);
+    logger.info(`Collaboration session created: ${sessionId}`);
     return sessionId;
   }
 
@@ -365,7 +366,7 @@ class CroweCodeCollaborationEngine {
       sharedFiles: session.sharedFiles
     });
 
-    console.log(`User ${userId} joined session ${sessionId}`);
+    logger.info(`User ${userId} joined session ${sessionId}`);
     return true;
   }
 
@@ -601,7 +602,7 @@ class CroweCodeCollaborationEngine {
 
   private async sendToParticipant(participantId: string, event: string, data: any): Promise<void> {
     // This would integrate with the WebSocket system
-    console.log(`Sending ${event} to ${participantId}:`, data);
+    logger.info(`Sending ${event} to ${participantId}:`, data);
   }
 
   private setupWebSocketHandlers(): void {
@@ -652,7 +653,7 @@ class CroweCodeCollaborationEngine {
       this.participantSessions.delete(participant.id);
     }
 
-    console.log(`Session ${sessionId} ended`);
+    logger.info(`Session ${sessionId} ended`);
   }
 
   // Utility methods
@@ -821,7 +822,7 @@ class CollaborationAIAssistant {
         status: 'pending'
       });
     } catch (error) {
-      console.error('AI analysis failed:', error);
+      logger.error('AI analysis failed:', error);
     }
 
     return suggestions;

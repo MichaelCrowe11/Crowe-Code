@@ -4,6 +4,7 @@
  */
 
 import { AIProviderManager } from '@/lib/ai-provider';
+import logger from '../logger';
 
 export interface ContaminationAnalysis {
   hasContamination: boolean;
@@ -122,7 +123,7 @@ export class ContaminationDetectionAI {
       };
 
     } catch (error) {
-      console.error('Error analyzing image for contamination:', error);
+      logger.error('Error analyzing image for contamination:', error);
       throw new Error('Failed to analyze image');
     }
   }

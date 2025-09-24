@@ -1,5 +1,6 @@
 import { createClient } from 'redis'
 import { siteConfig } from '@/config/site'
+import logger from './logger';
 
 // Redis client singleton
 let redisClient: ReturnType<typeof createClient> | null = null
@@ -11,7 +12,7 @@ export async function getRedisClient() {
       socket: {
         reconnectStrategy: (retries) => {
           if (retries > 10) {
-            console.error('Redis: Max reconnection attempts reached')
+            logger.error('Redis: Max reconnection attempts reached')
             return false
           }
           return Math.min(retries * 100, 3000)
@@ -20,11 +21,11 @@ export async function getRedisClient() {
     })
 
     redisClient.on('error', (err) => {
-      console.error('Redis Client Error:', err)
+      logger.error('Redis Client Error:', err)
     })
 
     redisClient.on('connect', () => {
-      console.log('Redis: Connected successfully')
+      logger.info('Redis: Connected successfully')
     })
 
     await redisClient.connect()
@@ -61,7 +62,7 @@ export class Cache {
       const data = await this.client!.get(key)
       return data ? JSON.parse(data) : null
     } catch (error) {
-      console.error(`Cache get error for key ${key}:`, error)
+      logger.error(`Cache get error for key ${key}:`, error)
       return null
     }
   }
@@ -75,7 +76,7 @@ export class Cache {
         JSON.stringify(value)
       )
     } catch (error) {
-      console.error(`Cache set error for key ${key}:`, error)
+      logger.error(`Cache set error for key ${key}:`, error)
     }
   }
 
@@ -84,7 +85,7 @@ export class Cache {
       if (!this.client) await this.initialize()
       await this.client!.del(key)
     } catch (error) {
-      console.error(`Cache delete error for key ${key}:`, error)
+      logger.error(`Cache delete error for key ${key}:`, error)
     }
   }
 
@@ -93,7 +94,7 @@ export class Cache {
       if (!this.client) await this.initialize()
       await this.client!.flushAll()
     } catch (error) {
-      console.error('Cache flush error:', error)
+      logger.error('Cache flush error:', error)
     }
   }
 
@@ -103,7 +104,7 @@ export class Cache {
       const result = await this.client!.exists(key)
       return result === 1
     } catch (error) {
-      console.error(`Cache exists error for key ${key}:`, error)
+      logger.error(`Cache exists error for key ${key}:`, error)
       return false
     }
   }
@@ -117,7 +118,7 @@ export class Cache {
         await this.client!.del(keys)
       }
     } catch (error) {
-      console.error(`Cache delete pattern error for ${pattern}:`, error)
+      logger.error(`Cache delete pattern error for ${pattern}:`, error)
     }
   }
 

@@ -30,6 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { Editor } from "@monaco-editor/react";
+import logger from '../../lib/logger';
 
 interface CodeExecutionResult {
   output: string;
@@ -88,7 +89,7 @@ function createAdvancedAPI() {
       wsRef.current = new WebSocket("wss://crowecode-main.fly.dev/api/quantum-engine");
 
       wsRef.current.onopen = () => {
-        console.log("🚀 Quantum Engine connected");
+        logger.info("🚀 Quantum Engine connected");
       };
 
       wsRef.current.onmessage = (event) => {
@@ -228,7 +229,7 @@ function createAdvancedAPI() {
         updateCodeMetrics(result.metrics);
       }
     } catch (error) {
-      console.error("AI generation failed:", error);
+      logger.error("AI generation failed:", error);
     } finally {
       setIsGenerating(false);
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import logger from '../../lib/logger';
 import {
   Lightbulb,
   AlertCircle,
@@ -83,7 +84,7 @@ export default function CodeSuggestions({
         setSuggestions(data.suggestions);
       }
     } catch (err: any) {
-      console.error("Error analyzing code:", err);
+      logger.error("Error analyzing code:", err);
       setError(err.message || "Failed to analyze code");
       setSuggestions([]);
     } finally {

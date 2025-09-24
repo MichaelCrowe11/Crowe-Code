@@ -1,3 +1,4 @@
+import logger from '../logger';
 /**
  * CroweCode™ Marketplace Manager
  * Enterprise-grade extension marketplace with VS Code compatibility
@@ -198,7 +199,7 @@ class CroweCodeMarketplace {
       const data = await response.json();
       return data.results[0]?.extensions?.map((ext: any) => this.mapVSCodeExtension(ext)) || [];
     } catch (error) {
-      console.warn('VS Code marketplace search failed:', error);
+      logger.warn('VS Code marketplace search failed:', error);
       return [];
     }
   }
@@ -231,7 +232,7 @@ class CroweCodeMarketplace {
         return data.extensions || [];
       }
     } catch (error) {
-      console.warn('CroweCode marketplace search failed:', error);
+      logger.warn('CroweCode marketplace search failed:', error);
     }
 
     return [];
@@ -408,11 +409,11 @@ class CroweCodeMarketplace {
       try {
         const metadata = await this.getExtensionMetadata(id, 'vscode');
         if (metadata && metadata.version > pkg.metadata.version) {
-          console.log(`Update available for ${id}: ${metadata.version}`);
+          logger.info(`Update available for ${id}: ${metadata.version}`);
           // Notify user about update
         }
       } catch (error) {
-        console.warn(`Failed to check update for ${id}:`, error);
+        logger.warn(`Failed to check update for ${id}:`, error);
       }
     }
   }
@@ -435,7 +436,7 @@ class CroweCodeMarketplace {
           return this.mapVSCodeExtension(data);
         }
       } catch (error) {
-        console.warn(`Failed to fetch metadata for ${extensionId}:`, error);
+        logger.warn(`Failed to fetch metadata for ${extensionId}:`, error);
       }
     }
 
@@ -540,16 +541,16 @@ class CroweCodeMarketplace {
   private async registerExtension(pkg: ExtensionPackage): Promise<void> {
     // Register with Monaco editor or VS Code API
     // This would integrate with the actual editor instance
-    console.log(`Registered extension: ${pkg.metadata.id}`);
+    logger.info(`Registered extension: ${pkg.metadata.id}`);
 
     // Register activation events
     if (pkg.metadata.activationEvents?.length > 0) {
-      console.log(`Activation events: ${pkg.metadata.activationEvents.join(', ')}`);
+      logger.info(`Activation events: ${pkg.metadata.activationEvents.join(', ')}`);
     }
 
     // Register contributions (commands, languages, themes, etc.)
     if (pkg.metadata.contributes) {
-      console.log('Extension contributes:', pkg.metadata.contributes);
+      logger.info('Extension contributes:', pkg.metadata.contributes);
     }
   }
 

@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import zlib from 'zlib';
 import { promisify } from 'util';
+import logger from '../lib/logger';
 
 const brotliCompress = promisify(zlib.brotliCompress);
 const gzipCompress = promisify(zlib.gzip);
@@ -148,7 +149,7 @@ export async function compressionMiddleware(
       }
     });
   } catch (error) {
-    console.error('Compression error:', error);
+    logger.error('Compression error:', error);
     // Return original response on error
     return response;
   }

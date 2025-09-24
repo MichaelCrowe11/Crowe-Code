@@ -170,7 +170,7 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur-md opacity-50" />
               <Image
                 src="/crowe-avatar.png"
-                alt="Crowe Logic"
+                alt="CroweCode"
                 width={40}
                 height={40}
                 className="relative rounded-lg"
@@ -178,7 +178,7 @@ export default function LandingPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Crowe Logic
+                CroweCode
               </h1>
               <p className="text-xs text-gray-400">Next-Gen Development Platform</p>
             </div>
@@ -461,8 +461,8 @@ function SmartDashboard({ data }) {
                 Ready to Transform Your Development?
               </span>
             </h2>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Join thousands of developers who are already building the future with Crowe Logic
+              <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+              Join thousands of developers who are already building the future with CroweCode
             </p>
             <FuturisticButton
               variant="quantum"
@@ -524,13 +524,13 @@ function SmartDashboard({ data }) {
             <div className="flex items-center gap-3 mb-4 md:mb-0">
               <Image
                 src="/crowe-avatar.png"
-                alt="Crowe Logic"
+                alt="CroweCode"
                 width={32}
                 height={32}
                 className="rounded-lg"
               />
               <p className="text-sm text-gray-400">
-                © 2025 Crowe Logic. All rights reserved.
+                © 2025 CroweCode. All rights reserved.
               </p>
             </div>
             <div className="flex items-center gap-6">

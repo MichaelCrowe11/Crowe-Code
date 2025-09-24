@@ -9,6 +9,7 @@ import { verifyAccessToken, UserPayload } from './auth-enhanced'
 import { cache } from './cache-service'
 import { EventEmitter } from 'events'
 import { createHash } from 'crypto'
+import logger from './logger';
 
 // WebSocket event types
 export enum WSEventType {
@@ -161,7 +162,7 @@ export class WebSocketService extends EventEmitter {
     })
     
     this.setupSocketHandlers()
-    console.log('WebSocket service initialized')
+    logger.info('WebSocket service initialized')
   }
   
   /**
@@ -171,7 +172,7 @@ export class WebSocketService extends EventEmitter {
     if (!this.io) return
     
     this.io.on(WSEventType.CONNECT, (socket: Socket) => {
-      console.log(`Socket connected: ${socket.id}`)
+      logger.info(`Socket connected: ${socket.id}`)
       this.sockets.set(socket.id, socket)
       
       // Authentication middleware
@@ -238,7 +239,7 @@ export class WebSocketService extends EventEmitter {
       
       // Error handling
       socket.on(WSEventType.ERROR, (error: Error) => {
-        console.error(`Socket error for ${socket.id}:`, error)
+        logger.error(`Socket error for ${socket.id}:`, error)
         this.emit('socket_error', { socketId: socket.id, error })
       })
     })
@@ -278,7 +279,7 @@ export class WebSocketService extends EventEmitter {
       
       return user
     } catch (error) {
-      console.error('Socket authentication error:', error)
+      logger.error('Socket authentication error:', error)
       return null
     }
   }
@@ -599,7 +600,7 @@ export class WebSocketService extends EventEmitter {
     }
     
     this.sockets.delete(socket.id)
-    console.log(`Socket disconnected: ${socket.id}`)
+    logger.info(`Socket disconnected: ${socket.id}`)
   }
   
   /**

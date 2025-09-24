@@ -1,7 +1,8 @@
 import Stripe from "stripe";
+import logger from '../logger';
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn("⚠️ STRIPE_SECRET_KEY is not set. Stripe features will be disabled.");
+  logger.warn("⚠️ STRIPE_SECRET_KEY is not set. Stripe features will be disabled.");
 }
 
 export const stripe = process.env.STRIPE_SECRET_KEY

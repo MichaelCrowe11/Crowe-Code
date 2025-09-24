@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="64" viewBox="0 0 320 64" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06B6D4"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="320" height="64" fill="none"/>
+  <g>
+    <text x="16" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace" font-size="28" font-weight="700" fill="url(#g)">
+      crowe/code
+    </text>
+    <rect x="215" y="14" width="2" height="36" rx="1" fill="#ffffff" opacity="0.85">
+      <animate attributeName="opacity" values="0.2;1;0.2" dur="1.2s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+</svg>

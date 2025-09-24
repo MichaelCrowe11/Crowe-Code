@@ -6,6 +6,7 @@
 
 import { aiProviderManager } from '../ai-provider';
 import { croweCodeMCPManager } from '../marketplace/kilocode-integration';
+import logger from '../logger';
 
 export interface AutonomousTask {
   id: string;
@@ -365,7 +366,7 @@ class CroweCodeAutonomousAgent {
     };
 
     this.taskQueue.push(task);
-    console.log(`Autonomous task submitted: ${task.id} - ${task.title}`);
+    logger.info(`Autonomous task submitted: ${task.id} - ${task.title}`);
 
     return task.id;
   }
@@ -384,7 +385,7 @@ class CroweCodeAutonomousAgent {
           this.completedTasks.set(task.id, result);
           this.runningTasks.delete(task.id);
         } catch (error) {
-          console.error(`Task ${task.id} failed:`, error);
+          logger.error(`Task ${task.id} failed:`, error);
           this.runningTasks.delete(task.id);
         }
       }

@@ -6,6 +6,7 @@
 import { SpeechClient } from '@google-cloud/speech';
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import { TranslationServiceClient } from '@google-cloud/translate';
+import logger from './logger';
 
 interface VoiceConfig {
   languageCode: string;
@@ -60,9 +61,9 @@ class GoogleSpeechProvider {
         keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
       });
 
-      console.log('Google Speech services initialized successfully');
+      logger.info('Google Speech services initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize Google Speech services:', error);
+      logger.error('Failed to initialize Google Speech services:', error);
     }
   }
 
@@ -143,7 +144,7 @@ class GoogleSpeechProvider {
         words,
       };
     } catch (error) {
-      console.error('Transcription error:', error);
+      logger.error('Transcription error:', error);
       throw error;
     }
   }
@@ -230,7 +231,7 @@ class GoogleSpeechProvider {
 
       return audioBuffer;
     } catch (error) {
-      console.error('TTS error:', error);
+      logger.error('TTS error:', error);
       throw error;
     }
   }
@@ -260,7 +261,7 @@ class GoogleSpeechProvider {
         naturalSampleRateHertz: voice.naturalSampleRateHertz || 24000,
       })) || [];
     } catch (error) {
-      console.error('Error listing voices:', error);
+      logger.error('Error listing voices:', error);
       return [];
     }
   }
@@ -289,7 +290,7 @@ class GoogleSpeechProvider {
       const [response] = await this.translateClient.translateText(request);
       return response.translations?.[0]?.translatedText || text;
     } catch (error) {
-      console.error('Translation error:', error);
+      logger.error('Translation error:', error);
       return text;
     }
   }
@@ -319,7 +320,7 @@ class GoogleSpeechProvider {
         confidence: detection?.confidence || 0,
       };
     } catch (error) {
-      console.error('Language detection error:', error);
+      logger.error('Language detection error:', error);
       return { language: 'unknown', confidence: 0 };
     }
   }

@@ -74,10 +74,39 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET" \
         --app "$APP_NAME"
 
-    # Update NextAuth URL for production
-    flyctl secrets set \
-        NEXTAUTH_URL="https://crowecode-main.fly.dev" \
-        --app "$APP_NAME"
+    # Update NextAuth URL and Secret for staging (Fly)
+    if ! command -v openssl &> /dev/null; then
+        echo "OpenSSL not found; please ensure NEXTAUTH_SECRET is set separately."
+        flyctl secrets set \
+            NEXTAUTH_URL="https://crowecode-main.fly.dev" \
+            --app "$APP_NAME"
+    else
+        GENERATED_SECRET=$(openssl rand -base64 32)
+        flyctl secrets set \
+            NEXTAUTH_URL="https://crowecode-main.fly.dev" \
+            NEXTAUTH_SECRET="$GENERATED_SECRET" \
+            --app "$APP_NAME"
+    fi
+
+    # Optional: Set production URL as well
+    read -p "Also set production NEXTAUTH_URL to https://www.crowecode.com? (y/n) " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if [[ -z "$GENERATED_SECRET" ]]; then
+            GENERATED_SECRET=$(openssl rand -base64 32 2>/dev/null || echo "")
+        fi
+        if [[ -n "$GENERATED_SECRET" ]]; then
+            flyctl secrets set \
+                NEXTAUTH_URL="https://www.crowecode.com" \
+                NEXTAUTH_SECRET="$GENERATED_SECRET" \
+                --app "$APP_NAME"
+        else
+            flyctl secrets set \
+                NEXTAUTH_URL="https://www.crowecode.com" \
+                --app "$APP_NAME"
+            echo "(NEXTAUTH_SECRET unchanged; set it manually if needed)"
+        fi
+    fi
 
     echo ""
     echo "✅ OAuth secrets have been set successfully!"

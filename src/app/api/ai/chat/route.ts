@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth/nextauth-config";
 import { generateCode } from "@/lib/ai-provider";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import logger from '../../../../lib/logger';
 
 const chatSchema = z.object({
   messages: z.array(z.object({
@@ -184,7 +185,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("Error in AI chat:", error);
+    logger.error("Error in AI chat:", error);
     return NextResponse.json(
       { error: "Failed to process AI request" },
       { status: 500 }

@@ -1,4 +1,5 @@
 import type { CrowePlugin, PluginContext } from './plugin-system';
+import logger from '../logger';
 
 // Example Plugin 1: Enhanced Git Integration
 export const gitEnhancedPlugin: CrowePlugin = {
@@ -429,7 +430,7 @@ export const productivityBoosterPlugin: CrowePlugin = {
         const editor = context.editor.getActiveEditor();
         if (editor) {
           // Trigger save (would integrate with actual save mechanism)
-          console.log('Auto-saving...');
+          logger.info('Auto-saving...');
         }
       }, 30000); // 30 seconds
     };

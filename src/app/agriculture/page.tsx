@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import logger from '../../lib/logger';
 import { 
   ArrowLeft, Leaf, Droplets, Sun, Wind, Thermometer, 
   Activity, Mic, MicOff, Volume2, Wifi, WifiOff,
@@ -68,9 +69,9 @@ export default function AgricultureTrackingPage() {
       // Start voice recording
       try {
         // This would connect to ElevenLabs API
-        console.log('Starting voice recording...');
+        logger.info('Starting voice recording...');
       } catch (error) {
-        console.error('Voice recording error:', error);
+        logger.error('Voice recording error:', error);
       }
     }
   };

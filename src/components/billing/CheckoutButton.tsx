@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Button } from '@/components/ui/button';
+import logger from '../../lib/logger';
 
 interface CheckoutButtonProps {
   tierId: 'developer' | 'team' | 'enterprise';
@@ -67,7 +68,7 @@ export function CheckoutButton({
         throw error;
       }
     } catch (err) {
-      console.error('Checkout error:', err);
+      logger.error('Checkout error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

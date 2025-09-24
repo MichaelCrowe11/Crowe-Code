@@ -12,6 +12,7 @@ import {
   registerCroweLanguage,
   getLanguageFromExtension
 } from '@/lib/monaco/crowe-language';
+import logger from '../lib/logger';
 import {
   Settings,
   Palette,
@@ -156,7 +157,7 @@ export default function EnhancedMonacoEditor({
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyP, () => {
       // Command palette functionality
-      console.log('Command palette triggered');
+      logger.info('Command palette triggered');
     });
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyD, () => {
@@ -269,7 +270,7 @@ export default function EnhancedMonacoEditor({
         }
       }
     } catch (error) {
-      console.error('AI suggestion error:', error);
+      logger.error('AI suggestion error:', error);
     } finally {
       setIsLoadingAI(false);
     }

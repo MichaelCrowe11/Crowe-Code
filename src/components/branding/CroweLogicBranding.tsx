@@ -2,6 +2,7 @@
 
 import React from 'react';
 import CroweLogicLogo from './CroweLogicLogo';
+import CroweCodeLogo from './CroweCodeLogo';
 
 interface BrandingProps {
   variant?: 'header' | 'footer' | 'splash' | 'minimal';
@@ -11,7 +12,7 @@ interface BrandingProps {
 export function CroweLogicHeader({ className = '' }: { className?: string }) {
   return (
     <header className={`h-14 border-b border-white/10 flex items-center px-4 bg-gradient-to-r from-zinc-900 via-zinc-850 to-zinc-900 ${className}`}>
-      <CroweLogicLogo size="md" showText showTagline variant="glow" />
+      <CroweCodeLogo size="md" showText showTagline />
 
       {/* Navigation */}
       <nav className="flex-1 flex items-center justify-center gap-6">
@@ -35,7 +36,7 @@ export function CroweLogicFooter({ className = '' }: { className?: string }) {
   return (
     <footer className={`h-8 border-t border-white/10 flex items-center justify-between px-4 bg-zinc-900/80 ${className}`}>
       <div className="flex items-center gap-4 text-xs text-white/40">
-        <span>© 2025 Crowe Logic Platform</span>
+        <span>© 2025 CroweCode</span>
         <span>•</span>
         <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
         <span>•</span>
@@ -48,8 +49,8 @@ export function CroweLogicFooter({ className = '' }: { className?: string }) {
           <span className="text-white/40">All Systems Operational</span>
         </span>
         <span className="text-white/30">•</span>
-        <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold">
-          Crowe Intelligence v2.0
+        <span className="cc-text-gradient font-semibold">
+          CroweCode Intelligence v2.0
         </span>
       </div>
     </footer>
@@ -59,14 +60,14 @@ export function CroweLogicFooter({ className = '' }: { className?: string }) {
 export function CroweLogicSplash({ className = '' }: { className?: string }) {
   return (
     <div className={`flex flex-col items-center justify-center gap-6 p-8 ${className}`}>
-      <CroweLogicLogo size="xl" showText showTagline variant="glow" />
+  <CroweCodeLogo size="xl" showText showTagline />
 
       <div className="text-center space-y-2 max-w-md">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Welcome to Crowe Logic Platform
+        <h1 className="text-2xl font-bold cc-text-gradient">
+          Welcome to CroweCode
         </h1>
         <p className="text-sm text-white/60">
-          The most advanced AI-powered development platform. Build, deploy, and scale with intelligence.
+          A code-native, AI-assisted workspace for shipping great software.
         </p>
       </div>
 
@@ -83,16 +84,16 @@ export function CroweLogicSplash({ className = '' }: { className?: string }) {
 }
 
 export function CroweLogicBadge({
-  text = "Powered by Crowe Logic",
+  text = "Powered by CroweCode",
   className = ''
 }: {
   text?: string;
   className?: string;
 }) {
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-400/20 rounded-full ${className}`}>
-      <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse" />
-      <span className="text-xs bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold">
+    <div className={`inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/15 rounded-full ${className}`}>
+      <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundImage: "linear-gradient(90deg, var(--brand-secondary), var(--brand-primary))" }} />
+      <span className="text-xs cc-text-gradient font-semibold">
         {text}
       </span>
     </div>
@@ -101,7 +102,7 @@ export function CroweLogicBadge({
 
 export function CroweLogicStatusBar({
   status = 'connected',
-  message = 'Crowe Intelligence Active',
+  message = 'CroweCode Intelligence Active',
   className = ''
 }: {
   status?: 'connected' | 'disconnected' | 'loading';

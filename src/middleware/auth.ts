@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import logger from '../lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +24,7 @@ export async function verifyToken(token: string): Promise<AuthUser | null> {
   try {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      console.error('JWT_SECRET not configured');
+      logger.error('JWT_SECRET not configured');
       return null;
     }
 
@@ -48,7 +49,7 @@ export async function verifyToken(token: string): Promise<AuthUser | null> {
       permissions: [] // Load from role permissions table if needed
     };
   } catch (error) {
-    console.error('Token verification failed:', error);
+    logger.error('Token verification failed:', error);
     return null;
   }
 }
@@ -160,7 +161,7 @@ async function logAccess(user: AuthUser, request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Failed to log access:', error);
+    logger.error('Failed to log access:', error);
     // Don't fail the request if logging fails
   }
 }
@@ -219,7 +220,7 @@ export async function revokeToken(token: string): Promise<boolean> {
     });
     return true;
   } catch (error) {
-    console.error('Failed to revoke token:', error);
+    logger.error('Failed to revoke token:', error);
     return false;
   }
 }
@@ -236,8 +237,8 @@ export async function cleanupSessions() {
         }
       }
     });
-    console.log(`Cleaned up ${deleted.count} expired sessions`);
+    logger.info(`Cleaned up ${deleted.count} expired sessions`);
   } catch (error) {
-    console.error('Failed to cleanup sessions:', error);
+    logger.error('Failed to cleanup sessions:', error);
   }
 }

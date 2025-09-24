@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ChevronRight, Play, Save, Download, Upload, Plus, Trash2, Code, Database, Cloud, Settings, Cpu, GitBranch, Package, Terminal, Zap, Eye, Copy, RefreshCw, Layers, Box, Grid3x3, Move, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import logger from '../../lib/logger';
 
 // Node Types
 type NodeType = 'function' | 'variable' | 'condition' | 'loop' | 'api' | 'database' | 'transform' | 'output' | 'input' | 'ai';
@@ -45,7 +46,7 @@ const nodeTemplates: NodeTemplate[] = [
   { type: 'database', label: 'Database', icon: Database, color: 'from-indigo-500 to-indigo-600', defaultCode: 'const result = await db.query(sql);', inputs: 1, outputs: 1 },
   { type: 'transform', label: 'Transform', icon: Zap, color: 'from-orange-500 to-orange-600', defaultCode: 'const transformed = data.map(item => item);', inputs: 1, outputs: 1 },
   { type: 'input', label: 'Input', icon: Terminal, color: 'from-teal-500 to-teal-600', defaultCode: 'const input = getUserInput();', inputs: 0, outputs: 1 },
-  { type: 'output', label: 'Output', icon: Eye, color: 'from-rose-500 to-rose-600', defaultCode: 'console.log(output);', inputs: 1, outputs: 0 },
+  { type: 'output', label: 'Output', icon: Eye, color: 'from-rose-500 to-rose-600', defaultCode: 'logger.info(output);', inputs: 1, outputs: 0 },
   { type: 'ai', label: 'AI Agent', icon: Cpu, color: 'from-fuchsia-500 to-fuchsia-600', defaultCode: 'const result = await ai.process(prompt);', inputs: 1, outputs: 1 }
 ];
 
@@ -190,7 +191,7 @@ export default function VisualCodeFlowEditor() {
         setNodes(flowData.nodes || []);
         setConnections(flowData.connections || []);
       } catch (error) {
-        console.error('Failed to load flow:', error);
+        logger.error('Failed to load flow:', error);
       }
     };
     reader.readAsText(file);

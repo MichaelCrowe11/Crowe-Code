@@ -35,6 +35,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import logger from '../../lib/logger';
 
 interface CollaboratorPresence {
   id: string;
@@ -139,7 +140,7 @@ export default function HyperCollabWorkspace() {
       detectVoice();
 
     } catch (error) {
-      console.error("Failed to initialize WebRTC:", error);
+      logger.error("Failed to initialize WebRTC:", error);
     }
   }, [isVideoEnabled, isVoiceEnabled, isActive]);
 
@@ -194,7 +195,7 @@ export default function HyperCollabWorkspace() {
       };
 
       wsRef.current.onerror = (error) => {
-        console.error("WebSocket error:", error);
+        logger.error("WebSocket error:", error);
         setConnectionStatus("disconnected");
       };
 
@@ -202,7 +203,7 @@ export default function HyperCollabWorkspace() {
       await initializeWebRTC();
 
     } catch (error) {
-      console.error("Failed to initialize workspace:", error);
+      logger.error("Failed to initialize workspace:", error);
       setConnectionStatus("disconnected");
     }
   }, [session, initializeWebRTC]);
@@ -322,7 +323,7 @@ export default function HyperCollabWorkspace() {
         // Stop screen sharing
       }
     } catch (error) {
-      console.error("Screen sharing failed:", error);
+      logger.error("Screen sharing failed:", error);
     }
   };
 

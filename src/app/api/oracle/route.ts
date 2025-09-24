@@ -10,6 +10,7 @@ import {
   getOCIConfig
 } from "@/lib/oracle-config";
 import * as oci from 'oci-sdk';
+import logger from '../../../lib/logger';
 
 // Initialize Oracle on first request
 let initialized = false;
@@ -20,7 +21,7 @@ async function ensureInitialized() {
       await initializeOracleDB();
       initialized = true;
     } catch (error) {
-      console.error('Failed to initialize Oracle:', error);
+      logger.error('Failed to initialize Oracle:', error);
     }
   }
 }
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest) {
         }, { status: 400 });
     }
   } catch (error: any) {
-    console.error('Oracle API error:', error);
+    logger.error('Oracle API error:', error);
     return NextResponse.json({
       error: error.message || 'Failed to execute Oracle operation',
       code: error.errorNum,
@@ -240,7 +241,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
     }
   } catch (error: any) {
-    console.error('Oracle API error:', error);
+    logger.error('Oracle API error:', error);
     return NextResponse.json({
       error: error.message || 'Failed to execute Oracle operation',
       code: error.errorNum,

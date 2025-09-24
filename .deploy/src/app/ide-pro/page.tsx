@@ -358,7 +358,7 @@ export default function ProductionIDE() {
             height={28}
             className="rounded-lg"
           />
-          <span className="font-semibold text-sm">Crowe Logic IDE</span>
+          <span className="font-semibold text-sm">CroweCode IDE</span>
           <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
             Production
           </span>
@@ -507,7 +507,7 @@ export default function ProductionIDE() {
       {/* Status Bar */}
       <div className="h-6 bg-zinc-900 border-t border-white/10 flex items-center px-3 text-[10px] text-white/50">
         <div className="flex items-center gap-4">
-          <span>Crowe Logic Platform v1.0</span>
+          <span>CroweCode v1.0</span>
           <span>TypeScript</span>
           <span>Node.js 20.11</span>
           <span className="flex items-center gap-1">

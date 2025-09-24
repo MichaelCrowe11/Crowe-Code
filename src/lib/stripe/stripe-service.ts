@@ -1,6 +1,7 @@
 import { stripe, PLANS, USAGE_PRICING } from "./stripe-config";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
+import logger from '../logger';
 
 export class StripeService {
   // Create a Stripe customer for a user
@@ -44,7 +45,7 @@ export class StripeService {
 
       return customer.id;
     } catch (error) {
-      console.error("Error creating Stripe customer:", error);
+      logger.error("Error creating Stripe customer:", error);
       throw error;
     }
   }
@@ -215,7 +216,7 @@ export class StripeService {
     const pricing = USAGE_PRICING[usageType];
 
     if (!pricing.meteredPriceId) {
-      console.warn(`No metered price ID configured for ${usageType}`);
+      logger.warn(`No metered price ID configured for ${usageType}`);
       return;
     }
 
@@ -240,7 +241,7 @@ export class StripeService {
         );
       }
     } catch (error) {
-      console.error(`Error recording usage for ${usageType}:`, error);
+      logger.error(`Error recording usage for ${usageType}:`, error);
     }
 
     // Always record in our database
@@ -299,7 +300,7 @@ export class StripeService {
         stripeDetails: stripeSubscription,
       };
     } catch (error) {
-      console.error("Error fetching Stripe subscription:", error);
+      logger.error("Error fetching Stripe subscription:", error);
       return subscription;
     }
   }

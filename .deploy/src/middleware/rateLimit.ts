@@ -1,5 +1,5 @@
 /**
- * Rate Limiting Middleware for Crowe Logic Platform
+ * Rate Limiting Middleware for CroweCode Platform
  * Prevents API abuse and ensures fair usage
  */
 

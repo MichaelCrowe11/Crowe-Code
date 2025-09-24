@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import type { CrowePlugin, PluginCategory } from '@/lib/plugins/plugin-system';
 import { pluginManager } from '@/lib/plugins/plugin-system';
+import logger from '../lib/logger';
 
 interface MarketplacePlugin extends CrowePlugin {
   downloads: number;
@@ -277,7 +278,7 @@ export default function PluginMarketplace() {
       await pluginManager.activatePlugin(plugin.id);
       setInstalledPlugins(prev => new Set([...prev, plugin.id]));
     } catch (error) {
-      console.error('Failed to install plugin:', error);
+      logger.error('Failed to install plugin:', error);
     }
   };
 
@@ -290,7 +291,7 @@ export default function PluginMarketplace() {
         return newSet;
       });
     } catch (error) {
-      console.error('Failed to uninstall plugin:', error);
+      logger.error('Failed to uninstall plugin:', error);
     }
   };
 

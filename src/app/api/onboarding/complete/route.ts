@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '../../../../lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error completing onboarding:', error);
+    logger.error('Error completing onboarding:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to complete onboarding' },
       { status: 500 }
@@ -123,7 +124,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching onboarding status:', error);
+    logger.error('Error fetching onboarding status:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch onboarding status' },
       { status: 500 }

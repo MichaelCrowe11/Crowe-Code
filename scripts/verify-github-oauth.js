@@ -1,9 +1,10 @@
+import logger from '../src/lib/logger';
 /**
  * Script to verify GitHub OAuth configuration
  */
 
-console.log('GitHub OAuth Configuration Check\n');
-console.log('================================\n');
+logger.info('GitHub OAuth Configuration Check\n');
+logger.info('================================\n');
 
 // Check environment variables
 const requiredVars = {
@@ -13,36 +14,36 @@ const requiredVars = {
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET
 };
 
-console.log('Environment Variables:');
+logger.info('Environment Variables:');
 Object.entries(requiredVars).forEach(([key, value]) => {
   if (value) {
-    console.log(`✅ ${key}: ${key.includes('SECRET') ? '***' + value.slice(-4) : value}`);
+    logger.info(`✅ ${key}: ${key.includes('SECRET') ? '***' + value.slice(-4) : value}`);
   } else {
-    console.log(`❌ ${key}: NOT SET`);
+    logger.info(`❌ ${key}: NOT SET`);
   }
 });
 
-console.log('\n\nRequired GitHub OAuth App Settings:');
-console.log('====================================');
-console.log('Homepage URL: https://crowecode-main.fly.dev');
-console.log('Authorization callback URL: https://crowecode-main.fly.dev/api/auth/callback/github');
+logger.info('\n\nRequired GitHub OAuth App Settings:');
+logger.info('====================================');
+logger.info('Homepage URL: https://crowecode-main.fly.dev');
+logger.info('Authorization callback URL: https://crowecode-main.fly.dev/api/auth/callback/github');
 
-console.log('\n\nTo update your GitHub OAuth App:');
-console.log('1. Go to: https://github.com/settings/developers');
-console.log('2. Click on your OAuth App');
-console.log('3. Update the Authorization callback URL to EXACTLY:');
-console.log('   https://crowecode-main.fly.dev/api/auth/callback/github');
-console.log('4. Make sure there are NO trailing slashes');
-console.log('5. Save the changes');
+logger.info('\n\nTo update your GitHub OAuth App:');
+logger.info('1. Go to: https://github.com/settings/developers');
+logger.info('2. Click on your OAuth App');
+logger.info('3. Update the Authorization callback URL to EXACTLY:');
+logger.info('   https://crowecode-main.fly.dev/api/auth/callback/github');
+logger.info('4. Make sure there are NO trailing slashes');
+logger.info('5. Save the changes');
 
-console.log('\n\nCommon Issues:');
-console.log('==============');
-console.log('1. Callback URL mismatch (must match EXACTLY)');
-console.log('2. Client ID/Secret incorrect');
-console.log('3. OAuth App disabled or suspended');
-console.log('4. Rate limiting from GitHub');
+logger.info('\n\nCommon Issues:');
+logger.info('==============');
+logger.info('1. Callback URL mismatch (must match EXACTLY)');
+logger.info('2. Client ID/Secret incorrect');
+logger.info('3. OAuth App disabled or suspended');
+logger.info('4. Rate limiting from GitHub');
 
-console.log('\n\nTest URLs:');
-console.log('==========');
-console.log('Direct GitHub OAuth: https://crowecode-main.fly.dev/api/auth/signin/github');
-console.log('Test Page: https://crowecode-main.fly.dev/auth/test');
+logger.info('\n\nTest URLs:');
+logger.info('==========');
+logger.info('Direct GitHub OAuth: https://crowecode-main.fly.dev/api/auth/signin/github');
+logger.info('Test Page: https://crowecode-main.fly.dev/auth/test');

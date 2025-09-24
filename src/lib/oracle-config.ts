@@ -1,6 +1,7 @@
 // Oracle Database and Cloud Configuration
 import oracledb from 'oracledb';
 import * as oci from 'oci-sdk';
+import logger from './logger';
 
 // Oracle Database Configuration
 export interface OracleDBConfig {
@@ -49,7 +50,7 @@ export async function initializeOracleDB(config?: OracleDBConfig): Promise<void>
     const dbConfig = config || getOracleDBConfig();
     
     if (!dbConfig.user || !dbConfig.password || !dbConfig.connectionString) {
-      console.warn('Oracle DB configuration is incomplete. Skipping initialization.');
+      logger.warn('Oracle DB configuration is incomplete. Skipping initialization.');
       return;
     }
 
@@ -68,9 +69,9 @@ export async function initializeOracleDB(config?: OracleDBConfig): Promise<void>
       poolIncrement: dbConfig.poolIncrement,
     });
 
-    console.log('Oracle Database connection pool created successfully');
+    logger.info('Oracle Database connection pool created successfully');
   } catch (error) {
-    console.error('Failed to initialize Oracle Database:', error);
+    logger.error('Failed to initialize Oracle Database:', error);
     throw error;
   }
 }
@@ -127,7 +128,7 @@ export async function closeOracleDB(): Promise<void> {
   if (connectionPool) {
     await connectionPool.close(0);
     connectionPool = null;
-    console.log('Oracle Database connection pool closed');
+    logger.info('Oracle Database connection pool closed');
   }
 }
 

@@ -6,24 +6,15 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
+import logger from '../logger';
 
 export const authOptions: NextAuthOptions = {
-  // Remove adapter when using JWT strategy
-  // adapter: PrismaAdapter(prisma) as any,
+  trustHost: true,
+  // Enable adapter for proper OAuth account linking
+  adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
   },
   pages: {
     signIn: "/login",
@@ -35,6 +26,7 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
       profile(profile) {
         return {
           id: profile.id.toString(),
@@ -48,6 +40,7 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           prompt: "consent",
@@ -105,35 +98,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Handle OAuth sign in - create user if doesn't exist
-      if (account?.provider === "github" || account?.provider === "google") {
-        try {
-          const email = user.email || profile?.email;
-          if (!email) return false;
-
-          // Check if user exists
-          const existingUser = await prisma.user.findUnique({
-            where: { email },
-          });
-
-          if (!existingUser) {
-            // Create new user from OAuth
-            await prisma.user.create({
-              data: {
-                email,
-                name: user.name || email.split("@")[0],
-                image: user.image,
-                role: "USER",
-                passwordHash: "", // OAuth users don't have passwords
-              },
-            });
-          }
-          return true;
-        } catch (error) {
-          console.error("OAuth sign in error:", error);
-          return false;
-        }
-      }
+      // Allow all sign-ins - PrismaAdapter handles user creation
       return true;
     },
     async redirect({ url, baseUrl }) {
@@ -143,29 +108,14 @@ export const authOptions: NextAuthOptions = {
       else if (new URL(url).origin === baseUrl) return url;
       return baseUrl + "/dashboard";
     },
-    async jwt({ token, user, account }) {
-      // Initial sign in
+    async jwt({ token, user, account, trigger }) {
+      // Initial sign in or update
       if (account && user) {
-        // For OAuth, fetch the user from database to get the correct ID
-        if (account.provider === "github" || account.provider === "google") {
-          const dbUser = await prisma.user.findUnique({
-            where: { email: user.email! },
-          });
-          if (dbUser) {
-            token.id = dbUser.id;
-            token.email = dbUser.email;
-            token.name = dbUser.name;
-            token.picture = dbUser.image;
-            token.role = dbUser.role;
-          }
-        } else {
-          // For credentials provider
-          token.id = user.id;
-          token.email = user.email;
-          token.name = user.name;
-          token.picture = user.image;
-          token.role = user.role || "USER";
-        }
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
+        token.role = user.role || "USER";
 
         // Store OAuth tokens if available
         token.accessToken = account.access_token;
@@ -189,28 +139,21 @@ export const authOptions: NextAuthOptions = {
 
       return session;
     },
-    async signIn({ user, account, profile }) {
-      // Allow all OAuth sign-ins (GitHub and Google)
-      if (account?.provider === "github" || account?.provider === "google") {
-        // With JWT strategy, we don't need to store in database here
-        // The user data will be stored in the JWT token
-        return true;
+    // (signIn callback consolidated above)
+  },
+  events: {
+    async signIn({ user, account, isNewUser }) {
+      if (user?.email) {
+        // Update last login time
+        await prisma.user.update({
+          where: { email: user.email },
+          data: { lastLoginAt: new Date() },
+        }).catch((err) => {
+          logger.error("Failed to update last login:", err);
+        });
       }
-
-      // Allow credentials sign-in
-      return true;
     },
   },
-  // Disable events for now since we're using JWT without database adapter
-  // events: {
-  //   async signIn({ user }) {
-  //     // Update last login time
-  //     await prisma.user.update({
-  //       where: { id: user.id },
-  //       data: { lastLoginAt: new Date() },
-  //     });
-  //   },
-  // },
   debug: process.env.NODE_ENV === "development",
 };
 

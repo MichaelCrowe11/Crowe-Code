@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { stripe, STRIPE_WEBHOOK_SECRET, PLANS } from "@/lib/stripe/stripe-config";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
+import logger from '../../../../lib/logger';
 
 // POST /api/stripe/webhook - Handle Stripe webhook events
 export async function POST(req: NextRequest) {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
       STRIPE_WEBHOOK_SECRET
     );
   } catch (err: any) {
-    console.error("Webhook signature verification failed:", err.message);
+    logger.error("Webhook signature verification failed:", err.message);
     return NextResponse.json(
       { error: `Webhook Error: ${err.message}` },
       { status: 400 }
@@ -73,12 +74,12 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        logger.info(`Unhandled event type ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Error processing webhook:", error);
+    logger.error("Error processing webhook:", error);
     return NextResponse.json(
       { error: "Webhook handler failed" },
       { status: 500 }
@@ -91,7 +92,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   const planId = session.metadata?.planId as keyof typeof PLANS;
 
   if (!userId || !planId) {
-    console.error("Missing metadata in checkout session");
+    logger.error("Missing metadata in checkout session");
     return;
   }
 
@@ -100,7 +101,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   });
 
   if (!customer) {
-    console.error("Customer not found for userId:", userId);
+    logger.error("Customer not found for userId:", userId);
     return;
   }
 
@@ -182,7 +183,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   });
 
   if (!customer) {
-    console.error("Customer not found for Stripe ID:", customerId);
+    logger.error("Customer not found for Stripe ID:", customerId);
     return;
   }
 

@@ -606,12 +606,12 @@ export default function CroweCodeIDE() {
         <div className="flex items-center gap-3">
           <Image
             src="/crowe-avatar.png"
-            alt="Crowe Logic"
+            alt="CroweCode"
             width={28}
             height={28}
             className="rounded-lg"
           />
-          <span className="font-semibold text-sm">Crowe Logic Platform</span>
+          <span className="font-semibold text-sm">CroweCode</span>
           <span className="text-xs text-white/50">IDE</span>
         </div>
         
@@ -992,7 +992,7 @@ export default function CroweCodeIDE() {
             <Bot className="h-3 w-3" />
             Claude API
           </span>
-          <span>© 2025 Crowe Logic</span>
+          <span>© 2025 CroweCode</span>
         </div>
       </div>
 

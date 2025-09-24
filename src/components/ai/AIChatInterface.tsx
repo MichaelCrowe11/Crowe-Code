@@ -26,6 +26,7 @@ import {
 import { useSession } from "next-auth/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import logger from '../../lib/logger';
 
 interface Message {
   id: string;
@@ -135,7 +136,7 @@ export default function AIChatInterface() {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Error:", error);
+      logger.error("Error:", error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "system",

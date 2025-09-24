@@ -8,6 +8,7 @@ import {
   Panel as ResizablePanel,
   PanelGroup as ResizablePanelGroup,
 } from "react-resizable-panels";
+import logger from '../../lib/logger';
 import {
   FileText,
   Folder,
@@ -96,7 +97,7 @@ function FileExplorer({ onFileSelect }: { onFileSelect: (file: string) => void }
           setFileTree(data.tree || []);
         }
       } catch (error) {
-        console.error('Failed to load file tree:', error);
+        logger.error('Failed to load file tree:', error);
       } finally {
         setLoading(false);
       }
@@ -412,7 +413,7 @@ const editorThemes = [
 
 
 // Main IDE Component
-export default function CroweLogicIDE() {
+export default function CroweCodeIDE() {
   const [activeFile, setActiveFile] = useState("src/app.tsx");
   const [openFiles, setOpenFiles] = useState(["src/app.tsx", "package.json"]);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -449,7 +450,7 @@ export default function CroweLogicIDE() {
             setCodes(prev => ({ ...prev, [file]: '' }));
           }
         } catch (error) {
-          console.error('Failed to load file:', error);
+          logger.error('Failed to load file:', error);
           setCodes(prev => ({ ...prev, [file]: '' }));
         }
       }
@@ -475,11 +476,11 @@ export default function CroweLogicIDE() {
         setLastSaveTime(new Date());
       } else {
         setSaveStatus('unsaved');
-        console.error('Failed to save file');
+        logger.error('Failed to save file');
       }
     } catch (error) {
       setSaveStatus('unsaved');
-      console.error('Save error:', error);
+      logger.error('Save error:', error);
     }
   };
 
@@ -611,17 +612,17 @@ export default function CroweLogicIDE() {
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur-md opacity-50" />
-            <Image
-              src="/crowe-avatar.png"
-              alt="Crowe Logic"
-              width={32}
-              height={32}
-              className="relative rounded-lg border border-white/20"
-            />
+              <Image
+                src="/crowe-avatar.png"
+                alt="CroweCode"
+                width={32}
+                height={32}
+                className="relative rounded-lg border border-white/20"
+              />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Crowe Logic</span>
+              <span className="font-bold text-sm bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">CroweCode</span>
               <span className="text-xs px-2 py-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-full text-blue-300">PLATFORM</span>
             </div>
             <span className="text-[10px] text-white/40">Intelligent Development Environment</span>
@@ -781,9 +782,9 @@ export default function CroweLogicIDE() {
                       <div>File tree temporarily disabled during deployment</div>
                       {/* <FileTree
                         onFileSelect={handleFileSelect}
-                        onFileCreate={(path) => console.log('File created:', path)}
-                        onFileDelete={(path) => console.log('File deleted:', path)}
-                        onFileRename={(oldPath, newPath) => console.log('File renamed:', oldPath, 'to', newPath)}
+                        onFileCreate={(path) => logger.info('File created:', path)}
+                        onFileDelete={(path) => logger.info('File deleted:', path)}
+                        onFileRename={(oldPath, newPath) => logger.info('File renamed:', oldPath, 'to', newPath)}
                       /> */}
                     </div>
                   </div>
@@ -838,7 +839,7 @@ export default function CroweLogicIDE() {
                       value={codes[activeFile] || ''}
                       onChange={handleCodeChange}
                       onThemeChange={setEditorTheme}
-                      onFileLanguageChange={(lang) => console.log('Language changed:', lang)}
+                      onFileLanguageChange={(lang) => logger.info('Language changed:', lang)}
                       showMinimap={showMinimap}
                       fontSize={fontSize}
                       wordWrap={wordWrap}
@@ -1015,15 +1016,15 @@ export default function CroweLogicIDE() {
           </span>
           <span className="flex items-center gap-1">
             <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse" />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold">Crowe Intelligence Active</span>
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold">CroweCode Intelligence Active</span>
           </span>
           <span className="flex items-center gap-1">
             <Bot className="h-3 w-3 text-blue-400" />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Crowe AI</span>
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">CroweCode AI</span>
           </span>
           <span className="flex items-center gap-1">
             <span className="text-white/30">Powered by</span>
-            <span className="font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Crowe Logic</span>
+            <span className="font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">CroweCode</span>
             <span className="text-white/30">© 2025</span>
           </span>
         </div>

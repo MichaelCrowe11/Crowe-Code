@@ -1,3 +1,4 @@
+import logger from '../logger';
 // Web Worker for performance-intensive operations
 
 interface WorkerMessage {

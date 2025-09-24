@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, File, Folder, FolderOpen, Plus, Trash2, Edit2 } from 'lucide-react';
+import logger from '../../lib/logger';
 
 interface FileNode {
   name: string;
@@ -68,7 +69,7 @@ export default function FileTree({
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load files');
-      console.error('Error loading directory:', err);
+      logger.error('Error loading directory:', err);
     } finally {
       setLoading(false);
     }
@@ -162,7 +163,7 @@ export default function FileTree({
         throw new Error('Failed to create file');
       }
     } catch (err) {
-      console.error('Error creating file:', err);
+      logger.error('Error creating file:', err);
       alert('Failed to create file');
     }
   };
@@ -187,7 +188,7 @@ export default function FileTree({
         throw new Error('Failed to delete');
       }
     } catch (err) {
-      console.error('Error deleting:', err);
+      logger.error('Error deleting:', err);
       alert('Failed to delete');
     }
   };
@@ -219,7 +220,7 @@ export default function FileTree({
         throw new Error('Failed to rename');
       }
     } catch (err) {
-      console.error('Error renaming:', err);
+      logger.error('Error renaming:', err);
       alert('Failed to rename');
     }
   };

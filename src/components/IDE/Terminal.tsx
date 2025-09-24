@@ -6,6 +6,7 @@ import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from 'xterm-addon-web-links';
 import 'xterm/css/xterm.css';
 import { X, Minimize2, Maximize2, Square, RotateCcw } from 'lucide-react';
+import logger from '../../lib/logger';
 
 interface TerminalProps {
   onClose?: () => void;
@@ -192,7 +193,7 @@ export default function Terminal({
               break;
           }
         } catch (err) {
-          console.error('Failed to parse WebSocket message:', err);
+          logger.error('Failed to parse WebSocket message:', err);
         }
       };
 

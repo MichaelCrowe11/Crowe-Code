@@ -6,6 +6,7 @@
 
 import { croweCodeAutonomousAgent } from '../ai/autonomous-agent';
 import { croweCodeMCPManager } from '../marketplace/kilocode-integration';
+import logger from '../logger';
 
 export interface Pipeline {
   id: string;
@@ -433,7 +434,7 @@ class CroweCodePipelineManager {
     // Generate platform-specific configuration
     await this.generatePlatformConfiguration(pipeline);
 
-    console.log(`Pipeline created: ${pipelineId}`);
+    logger.info(`Pipeline created: ${pipelineId}`);
     return pipelineId;
   }
 
@@ -818,7 +819,7 @@ class CroweCodePipelineManager {
     pipeline: Pipeline
   ): Promise<void> {
     // Implement notification sending logic
-    console.log(`Sending ${config.type} notification for execution ${execution.id}`);
+    logger.info(`Sending ${config.type} notification for execution ${execution.id}`);
   }
 
   private addExecutionLog(execution: PipelineExecution, level: ExecutionLog['level'], message: string): void {

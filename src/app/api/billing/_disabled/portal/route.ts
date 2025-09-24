@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { createBillingPortalSession } from '@/lib/billing/stripe';
+import logger from '../../../../../lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
       url: portalSession.url,
     });
   } catch (error) {
-    console.error('Billing portal session error:', error);
+    logger.error('Billing portal session error:', error);
     return NextResponse.json(
       { error: 'Failed to create billing portal session' },
       { status: 500 }

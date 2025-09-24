@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import { WebSocket } from 'ws';
+import logger from '../logger';
 
 export interface SensorConfig {
   id: string;
@@ -131,7 +132,7 @@ export class AgricultureIoTHub extends EventEmitter {
     const ws = new WebSocket(config.endpoint);
 
     ws.on('open', () => {
-      console.log(`WebSocket sensor ${config.id} connected`);
+      logger.info(`WebSocket sensor ${config.id} connected`);
       this.emit('sensorConnected', config.id);
     });
 
@@ -140,12 +141,12 @@ export class AgricultureIoTHub extends EventEmitter {
         const rawReading = JSON.parse(data.toString());
         this.processReading(config, rawReading);
       } catch (error) {
-        console.error(`Error processing WebSocket data for sensor ${config.id}:`, error);
+        logger.error(`Error processing WebSocket data for sensor ${config.id}:`, error);
       }
     });
 
     ws.on('error', (error) => {
-      console.error(`WebSocket error for sensor ${config.id}:`, error);
+      logger.error(`WebSocket error for sensor ${config.id}:`, error);
       this.emit('sensorError', config.id, error);
     });
 
@@ -157,7 +158,7 @@ export class AgricultureIoTHub extends EventEmitter {
    */
   private async connectMQTT(config: SensorConfig): Promise<void> {
     // Implementation would use mqtt library
-    console.log(`Connecting MQTT sensor ${config.id} to ${config.endpoint}`);
+    logger.info(`Connecting MQTT sensor ${config.id} to ${config.endpoint}`);
 
     // Mock connection for now
     const interval = setInterval(() => {
@@ -177,7 +178,7 @@ export class AgricultureIoTHub extends EventEmitter {
         const data = await response.json();
         this.processReading(config, data);
       } catch (error) {
-        console.error(`HTTP polling error for sensor ${config.id}:`, error);
+        logger.error(`HTTP polling error for sensor ${config.id}:`, error);
         this.emit('sensorError', config.id, error);
       }
     }, 10000); // Poll every 10 seconds
@@ -190,7 +191,7 @@ export class AgricultureIoTHub extends EventEmitter {
    */
   private async connectModbus(config: SensorConfig): Promise<void> {
     // Implementation would use modbus-serial library
-    console.log(`Connecting Modbus sensor ${config.id} to ${config.endpoint}`);
+    logger.info(`Connecting Modbus sensor ${config.id} to ${config.endpoint}`);
 
     // Mock for now
     const interval = setInterval(() => {
@@ -205,7 +206,7 @@ export class AgricultureIoTHub extends EventEmitter {
    */
   private async connectZigbee(config: SensorConfig): Promise<void> {
     // Implementation would use zigbee-herdsman library
-    console.log(`Connecting Zigbee sensor ${config.id} to ${config.endpoint}`);
+    logger.info(`Connecting Zigbee sensor ${config.id} to ${config.endpoint}`);
 
     // Mock for now
     const interval = setInterval(() => {
@@ -247,7 +248,7 @@ export class AgricultureIoTHub extends EventEmitter {
       this.emit('reading', reading);
 
     } catch (error) {
-      console.error(`Error processing reading for sensor ${config.id}:`, error);
+      logger.error(`Error processing reading for sensor ${config.id}:`, error);
       this.emit('processingError', config.id, error);
     }
   }
@@ -544,15 +545,15 @@ export class AgricultureIoTHub extends EventEmitter {
    */
   private setupEventHandlers(): void {
     this.on('reading', (reading: SensorReading) => {
-      console.log(`Sensor ${reading.sensorId}: ${reading.value} ${reading.unit}`);
+      logger.info(`Sensor ${reading.sensorId}: ${reading.value} ${reading.unit}`);
     });
 
     this.on('criticalAlert', (config: SensorConfig, reading: SensorReading) => {
-      console.error(`CRITICAL ALERT: Sensor ${config.id} value ${reading.value} outside safe range`);
+      logger.error(`CRITICAL ALERT: Sensor ${config.id} value ${reading.value} outside safe range`);
     });
 
     this.on('warning', (config: SensorConfig, reading: SensorReading) => {
-      console.warn(`WARNING: Sensor ${config.id} value ${reading.value} outside normal range`);
+      logger.warn(`WARNING: Sensor ${config.id} value ${reading.value} outside normal range`);
     });
   }
 }

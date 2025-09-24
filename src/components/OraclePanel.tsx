@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { 
+import logger from '../lib/logger';
   Database, 
   Table, 
   Server, 
@@ -73,7 +74,7 @@ export default function OraclePanel() {
       setDbStatus(data.database);
       setOciStatus(data.oci);
     } catch (error) {
-      console.error('Failed to check Oracle status:', error);
+      logger.error('Failed to check Oracle status:', error);
     }
   };
 
@@ -105,7 +106,7 @@ export default function OraclePanel() {
         setSchemas(['USER', ...data.schemas.map((s: any) => s.SCHEMA_NAME)]);
       }
     } catch (error) {
-      console.error('Failed to load schemas:', error);
+      logger.error('Failed to load schemas:', error);
     }
   };
 

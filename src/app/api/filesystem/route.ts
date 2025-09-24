@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
+import logger from '../../../lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -106,7 +107,7 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Filesystem API error:', error);
+    logger.error('Filesystem API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -159,7 +160,7 @@ export async function POST(request: NextRequest) {
           path: filePath
         });
       } catch (error) {
-        console.error('Write error:', error);
+        logger.error('Write error:', error);
         return NextResponse.json(
           { error: 'Failed to write file' },
           { status: 500 }
@@ -255,7 +256,7 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Filesystem API error:', error);
+    logger.error('Filesystem API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -303,7 +304,7 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Upload error:', error);
+    logger.error('Upload error:', error);
     return NextResponse.json(
       { error: 'Failed to upload file' },
       { status: 500 }

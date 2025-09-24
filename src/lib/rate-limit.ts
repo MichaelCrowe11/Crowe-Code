@@ -1,6 +1,7 @@
 // src/lib/rate-limit.ts - Advanced rate limiting for CroweCode platform
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import logger from './logger';
 
 // Different rate limits for different types of operations
 export const rateLimits = {
@@ -152,7 +153,7 @@ export async function checkRateLimits(
         };
       }
     } catch (error) {
-      console.error(`Rate limit check failed for ${limitType}:`, error);
+      logger.error(`Rate limit check failed for ${limitType}:`, error);
       // In case of error, allow the request but log it
       continue;
     }
@@ -253,7 +254,7 @@ export async function advancedRateLimit(
     };
 
   } catch (error) {
-    console.error(`Advanced rate limit check failed:`, error);
+    logger.error(`Advanced rate limit check failed:`, error);
     
     // Fallback - allow request but with minimal limits
     return {

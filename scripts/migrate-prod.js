@@ -1,8 +1,9 @@
+import logger from '../src/lib/logger';
 #!/usr/bin/env node
 
 const { execSync } = require('child_process');
 
-console.log('🚀 Running database migrations...\n');
+logger.info('🚀 Running database migrations...\n');
 
 // Set the production database URL
 process.env.DATABASE_URL = process.env.DATABASE_URL ||
@@ -10,15 +11,15 @@ process.env.DATABASE_URL = process.env.DATABASE_URL ||
 
 try {
   // Generate Prisma client
-  console.log('📦 Generating Prisma client...');
+  logger.info('📦 Generating Prisma client...');
   execSync('npx prisma generate', { stdio: 'inherit' });
 
   // Deploy migrations
-  console.log('\n🔄 Deploying migrations...');
+  logger.info('\n🔄 Deploying migrations...');
   execSync('npx prisma migrate deploy', { stdio: 'inherit' });
 
-  console.log('\n✅ Migrations deployed successfully!');
+  logger.info('\n✅ Migrations deployed successfully!');
 } catch (error) {
-  console.error('\n❌ Migration failed:', error.message);
+  logger.error('\n❌ Migration failed:', error.message);
   process.exit(1);
 }

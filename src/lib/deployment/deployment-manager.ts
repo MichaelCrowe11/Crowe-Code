@@ -6,6 +6,7 @@
 
 import { croweCodePipelineManager } from '../ci-cd/pipeline-integration';
 import { croweCodeAutonomousAgent } from '../ai/autonomous-agent';
+import logger from '../logger';
 
 export interface DeploymentConfiguration {
   id: string;
@@ -1085,7 +1086,7 @@ class CroweCodeDeploymentManager {
     };
 
     this.configurations.set(existingVPSConfig.id, existingVPSConfig);
-    console.log('Existing VPS deployment configuration loaded');
+    logger.info('Existing VPS deployment configuration loaded');
   }
 
   /**
@@ -1123,7 +1124,7 @@ class CroweCodeDeploymentManager {
 
     this.configurations.set(configId, deployment);
 
-    console.log(`Deployment configuration created: ${configId}`);
+    logger.info(`Deployment configuration created: ${configId}`);
     return configId;
   }
 
@@ -1209,7 +1210,7 @@ class CroweCodeDeploymentManager {
       // Send notifications
       await this.sendDeploymentNotifications(configuration, execution, 'completed');
 
-      console.log(`Deployment completed successfully: ${execution.id}`);
+      logger.info(`Deployment completed successfully: ${execution.id}`);
 
     } catch (error) {
       execution.status = 'failed';
@@ -1467,7 +1468,7 @@ class CroweCodeDeploymentManager {
       throw new Error('Deployment configuration not found');
     }
 
-    console.log(`Starting rollback for deployment: ${executionId}`);
+    logger.info(`Starting rollback for deployment: ${executionId}`);
 
     const rollbackExecutionId = this.generateExecutionId();
 
@@ -1524,7 +1525,7 @@ class CroweCodeDeploymentManager {
 
       await this.sendDeploymentNotifications(configuration, rollbackExecution, 'rollback');
 
-      console.log(`Rollback completed successfully: ${rollbackExecution.id}`);
+      logger.info(`Rollback completed successfully: ${rollbackExecution.id}`);
 
     } catch (error) {
       rollbackExecution.status = 'failed';
@@ -1609,7 +1610,7 @@ class CroweCodeDeploymentManager {
         }
       };
     } catch (error) {
-      console.warn('AI optimization failed, using default configuration');
+      logger.warn('AI optimization failed, using default configuration');
       return config;
     }
   }
@@ -1745,7 +1746,7 @@ class CroweCodeDeploymentManager {
   ): Promise<void> {
     // Handle deployment failure
     if (configuration.rollback.automatic) {
-      console.log('Automatic rollback triggered');
+      logger.info('Automatic rollback triggered');
       await this.rollback(execution.id);
     }
 
@@ -1769,7 +1770,7 @@ class CroweCodeDeploymentManager {
     execution: DeploymentExecution,
     event: DeploymentEvent
   ): Promise<void> {
-    console.log(`Sending ${config.type} notification for ${event}: ${execution.id}`);
+    logger.info(`Sending ${config.type} notification for ${event}: ${execution.id}`);
   }
 
   private addDeploymentLog(
@@ -1806,7 +1807,7 @@ class CroweCodeDeploymentManager {
           deployment.healthStatus = await this.checkDeploymentHealth(deployment, configuration);
         }
       } catch (error) {
-        console.error(`Health check failed for deployment ${deployment.id}:`, error);
+        logger.error(`Health check failed for deployment ${deployment.id}:`, error);
       }
     }
   }
@@ -2085,7 +2086,7 @@ class VPSAdapter extends DeploymentAdapter {
 
   async deployApplication(app: ApplicationConfig, strategy: string): Promise<void> {
     // Deploy application to VPS
-    console.log(`Deploying ${app.name} to VPS using ${strategy} strategy`);
+    logger.info(`Deploying ${app.name} to VPS using ${strategy} strategy`);
   }
 
   async setupMetrics(config: MetricsConfig): Promise<void> {

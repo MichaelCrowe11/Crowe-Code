@@ -116,12 +116,10 @@ function LoginContent() {
             className="text-center mb-8"
           >
             <div className="inline-flex items-center justify-center mb-6">
-              <HolographicDisplay variant="badge" color="59, 130, 246" intensity={2}>
+              <HolographicDisplay variant="badge" color="79, 70, 229" intensity={2}>
                 <div className="flex items-center gap-3 px-6 py-3">
-                  <Brain className="w-8 h-8 text-blue-400" />
-                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Crowe Logic
-                  </span>
+                  <Brain className="w-8 h-8" style={{ color: "#06B6D4" }} />
+                  <span className="text-2xl font-bold font-mono cc-text-gradient">crowe/code</span>
                 </div>
               </HolographicDisplay>
             </div>

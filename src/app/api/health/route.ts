@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import logger from '../../../lib/logger';
 
 export async function GET() {
   const startTime = Date.now();
@@ -32,7 +33,7 @@ export async function GET() {
       healthStatus.checks.database = 'not_configured';
     }
   } catch (error) {
-    console.error('Database health check failed:', error);
+    logger.error('Database health check failed:', error);
     healthStatus.checks.database = 'unhealthy';
     healthStatus.status = 'degraded';
   }
@@ -45,7 +46,7 @@ export async function GET() {
       healthStatus.checks.redis = 'not_configured';
     }
   } catch (error) {
-    console.error('Redis health check failed:', error);
+    logger.error('Redis health check failed:', error);
     healthStatus.checks.redis = 'unhealthy';
     healthStatus.status = 'degraded';
   }

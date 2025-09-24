@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { io, Socket } from "socket.io-client";
+import logger from '../lib/logger';
 import {
   Users,
   Video,
@@ -77,7 +78,7 @@ export default function Collaboration({
     });
 
     newSocket.on("connect", () => {
-      console.log("Connected to collaboration server");
+      logger.info("Connected to collaboration server");
       setIsConnected(true);
       
       // Join room
@@ -133,11 +134,11 @@ export default function Collaboration({
 
     newSocket.on("screen-share-update", (data) => {
       // Handle screen share updates from other users
-      console.log(`User ${data.userId} ${data.isSharing ? 'started' : 'stopped'} screen sharing`);
+      logger.info(`User ${data.userId} ${data.isSharing ? 'started' : 'stopped'} screen sharing`);
     });
 
     newSocket.on("disconnect", () => {
-      console.log("Disconnected from collaboration server");
+      logger.info("Disconnected from collaboration server");
       setIsConnected(false);
     });
 
@@ -209,7 +210,7 @@ export default function Collaboration({
         }
       });
     } catch (error) {
-      console.error("Error starting video call:", error);
+      logger.error("Error starting video call:", error);
     }
   };
 
@@ -319,7 +320,7 @@ export default function Collaboration({
           stopScreenShare();
         };
       } catch (error) {
-        console.error("Error sharing screen:", error);
+        logger.error("Error sharing screen:", error);
       }
     } else {
       stopScreenShare();

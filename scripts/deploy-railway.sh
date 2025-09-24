@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Railway Deployment Script for Crowe Logic Platform
+# Railway Deployment Script for CroweCode
 # Simple deployment with managed PostgreSQL and Redis
 
 set -e
 
-echo "🚂 Deploying Crowe Logic Platform to Railway"
+echo "🚂 Deploying CroweCode to Railway"
 echo "==========================================="
 
 # Colors for output
@@ -86,7 +86,7 @@ DEPLOYMENT_URL=$(railway status --json | jq -r '.url')
 if [ -n "$DEPLOYMENT_URL" ]; then
     echo -e "${GREEN}✅ Deployment successful!${NC}"
     echo ""
-    echo "🎉 Crowe Logic Platform is live at: $DEPLOYMENT_URL"
+    echo "🎉 CroweCode is live at: $DEPLOYMENT_URL"
     echo ""
     echo "📊 Management:"
     echo "  - Dashboard: railway open"

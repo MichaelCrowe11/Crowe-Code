@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import logger from '../../../../lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Terminal WebSocket endpoint error:', error);
+    logger.error('Terminal WebSocket endpoint error:', error);
     return NextResponse.json(
       { error: 'Failed to process terminal request' },
       { status: 500 }

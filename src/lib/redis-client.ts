@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+import logger from './logger';
 
 // Redis configuration from environment or provided credentials
 const redisConfig = {
@@ -15,7 +16,7 @@ export async function getRedisClient() {
       socket: {
         reconnectStrategy: (retries) => {
           if (retries > 10) {
-            console.error("Redis: Max reconnection attempts reached");
+            logger.error("Redis: Max reconnection attempts reached");
             return new Error("Max reconnection attempts reached");
           }
           return Math.min(retries * 100, 3000);
@@ -24,15 +25,15 @@ export async function getRedisClient() {
     });
 
     redisClient.on("error", (err) => {
-      console.error("Redis Client Error:", err);
+      logger.error("Redis Client Error:", err);
     });
 
     redisClient.on("connect", () => {
-      console.log("✅ Redis connected successfully");
+      logger.info("✅ Redis connected successfully");
     });
 
     redisClient.on("reconnecting", () => {
-      console.log("🔄 Redis reconnecting...");
+      logger.info("🔄 Redis reconnecting...");
     });
 
     await redisClient.connect();

@@ -1,4 +1,4 @@
-# 🚀 Crowe Logic Platform - Deployment Ready Summary
+# 🚀 CroweCode - Deployment Ready Summary
 
 ## ✅ Completed Improvements
 
@@ -25,7 +25,7 @@
 
 1. **Database Migration**
 ```bash
-cd crowe-logic-platform
+cd Crowe-Code
 npx prisma generate
 npx prisma db push  # For development
 # OR
@@ -39,7 +39,7 @@ Add these in Vercel Dashboard → Settings → Environment Variables:
 NEXTAUTH_SECRET=3trkdfes7LJydOw5XaD5xhJKqvSsTzdnjZbjHw9F/a8=
 JWT_SECRET=YsTFkykhI2EsfkVTD/xYtT2bueDDCAL/5n2oGDWaOmE=
 JWT_REFRESH_SECRET=[generate-new-secret]
-NEXTAUTH_URL=https://your-app.vercel.app
+NEXTAUTH_URL=https://www.crowecode.com
 
 # Database (use Vercel Postgres or external)
 DATABASE_URL=postgresql://...
@@ -134,7 +134,7 @@ npm run test:e2e
 
 ## 🎉 You're Production Ready!
 
-Your Crowe Logic Platform now has:
+Your CroweCode platform now has:
 - Enterprise-grade security
 - Professional error handling
 - Scalable architecture

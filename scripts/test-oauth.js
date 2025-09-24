@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * OAuth Flow Test Script for Crowe Logic Platform
+ * OAuth Flow Test Script for CroweCode
  * Tests GitHub and Google OAuth authentication flows
  */
 
 import https from 'https';
 import { URL } from 'url';
+import logger from '../src/lib/logger';
 
 const PRODUCTION_URL = 'https://crowecode-main.fly.dev';
 const AUTH_ENDPOINTS = {
@@ -28,7 +29,7 @@ const colors = {
 };
 
 function log(message, color = 'reset') {
-  console.log(`${colors[color]}${message}${colors.reset}`);
+  logger.info(`${colors[color]}${message}${colors.reset}`);
 }
 
 function checkEndpoint(url, method = 'GET') {
@@ -82,7 +83,7 @@ function checkEndpoint(url, method = 'GET') {
 }
 
 async function testOAuthFlow() {
-  log('\n🔍 Testing OAuth Configuration for Crowe Logic Platform\n', 'bright');
+  log('\n🔍 Testing OAuth Configuration for CroweCode\n', 'bright');
   log(`Production URL: ${PRODUCTION_URL}`, 'blue');
   log('================================================\n', 'cyan');
 

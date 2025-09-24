@@ -1,4 +1,4 @@
-// Crowe Logic Platform - Database Schema
+// CroweCode - Database Schema
 // This schema supports agriculture, mycology LIMS, and platform features
 
 generator client {

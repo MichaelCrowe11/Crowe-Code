@@ -6,6 +6,7 @@
 import { WebSocket, WebSocketServer } from 'ws';
 import { spawn, ChildProcess } from 'child_process';
 import * as pty from 'node-pty';
+import logger from '../logger';
 
 interface TerminalSession {
   id: string;
@@ -38,7 +39,7 @@ export class TerminalWebSocketServer {
 
   public initialize(port: number = 3002): void {
     if (this.wss) {
-      console.warn('WebSocket server already initialized');
+      logger.warn('WebSocket server already initialized');
       return;
     }
 
@@ -50,7 +51,7 @@ export class TerminalWebSocketServer {
 
     this.wss.on('connection', (ws, req) => {
       const sessionId = this.generateSessionId();
-      console.log(`New terminal WebSocket connection: ${sessionId}`);
+      logger.info(`New terminal WebSocket connection: ${sessionId}`);
 
       // Store client connection
       this.clients.set(sessionId, ws);
@@ -67,7 +68,7 @@ export class TerminalWebSocketServer {
           const message: TerminalMessage = JSON.parse(data.toString());
           this.handleMessage(sessionId, message, ws);
         } catch (error) {
-          console.error('Invalid terminal message:', error);
+          logger.error('Invalid terminal message:', error);
           ws.send(JSON.stringify({
             type: 'error',
             message: 'Invalid message format'
@@ -76,12 +77,12 @@ export class TerminalWebSocketServer {
       });
 
       ws.on('close', () => {
-        console.log(`Terminal WebSocket disconnected: ${sessionId}`);
+        logger.info(`Terminal WebSocket disconnected: ${sessionId}`);
         this.cleanupSession(sessionId);
       });
 
       ws.on('error', (error) => {
-        console.error(`Terminal WebSocket error for ${sessionId}:`, error);
+        logger.error(`Terminal WebSocket error for ${sessionId}:`, error);
         this.cleanupSession(sessionId);
       });
 
@@ -95,7 +96,7 @@ export class TerminalWebSocketServer {
       }, 30000);
     });
 
-    console.log(`Terminal WebSocket server listening on port ${port}`);
+    logger.info(`Terminal WebSocket server listening on port ${port}`);
   }
 
   private handleMessage(sessionId: string, message: TerminalMessage, ws: WebSocket): void {
@@ -162,7 +163,7 @@ export class TerminalWebSocketServer {
 
       } catch (ptyError) {
         // Fallback to basic child_process
-        console.warn('node-pty not available, using basic terminal:', ptyError);
+        logger.warn('node-pty not available, using basic terminal:', ptyError);
 
         terminalProcess = spawn(shell, [], {
           cwd: cwd,
@@ -213,7 +214,7 @@ Type 'help' for available commands
       this.sendOutput(sessionId, welcomeMessage);
 
     } catch (error) {
-      console.error('Failed to initialize terminal:', error);
+      logger.error('Failed to initialize terminal:', error);
       ws.send(JSON.stringify({
         type: 'error',
         message: 'Failed to initialize terminal session'
@@ -224,7 +225,7 @@ Type 'help' for available commands
   private handleInput(sessionId: string, data: string): void {
     const session = this.sessions.get(sessionId);
     if (!session || !session.process) {
-      console.warn(`No terminal session found for ${sessionId}`);
+      logger.warn(`No terminal session found for ${sessionId}`);
       return;
     }
 
@@ -253,7 +254,7 @@ Type 'help' for available commands
         session.process.stdin.write(data);
       }
     } catch (error) {
-      console.error(`Error handling input for ${sessionId}:`, error);
+      logger.error(`Error handling input for ${sessionId}:`, error);
     }
   }
 
@@ -271,7 +272,7 @@ Type 'help' for available commands
       }
       // Basic child_process doesn't support resize
     } catch (error) {
-      console.error(`Error resizing terminal for ${sessionId}:`, error);
+      logger.error(`Error resizing terminal for ${sessionId}:`, error);
     }
   }
 
@@ -327,7 +328,7 @@ Type 'help' for available commands
         session.process.kill();
       }
     } catch (error) {
-      console.error(`Error closing terminal for ${sessionId}:`, error);
+      logger.error(`Error closing terminal for ${sessionId}:`, error);
     }
 
     this.cleanupSession(sessionId);
@@ -343,7 +344,7 @@ Type 'help' for available commands
           session.process.kill();
         }
       } catch (error) {
-        console.error(`Error killing process for ${sessionId}:`, error);
+        logger.error(`Error killing process for ${sessionId}:`, error);
       }
     }
 
@@ -359,7 +360,7 @@ Type 'help' for available commands
 
       for (const [sessionId, session] of this.sessions) {
         if (now.getTime() - session.lastActivity.getTime() > timeout) {
-          console.log(`Cleaning up inactive session: ${sessionId}`);
+          logger.info(`Cleaning up inactive session: ${sessionId}`);
           this.cleanupSession(sessionId);
         }
       }

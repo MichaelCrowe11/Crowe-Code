@@ -1,3 +1,4 @@
+import logger from './logger';
 /**
  * Environment variable validation and configuration
  * Ensures all required secrets are present at startup
@@ -71,18 +72,18 @@ function validateEnv() {
   }
 
   if (missing.length > 0) {
-    console.error('❌ Missing required environment variables:');
-    missing.forEach(msg => console.error(`  - ${msg}`));
-    console.error('\n📝 Copy .env.example to .env.local and configure the required values.');
+    logger.error('❌ Missing required environment variables:');
+    missing.forEach(msg => logger.error(`  - ${msg}`));
+    logger.error('\n📝 Copy .env.example to .env.local and configure the required values.');
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 
   if (warnings.length > 0) {
-    console.warn('⚠️  Environment configuration warnings:');
-    warnings.forEach(msg => console.warn(`  - ${msg}`));
+    logger.warn('⚠️  Environment configuration warnings:');
+    warnings.forEach(msg => logger.warn(`  - ${msg}`));
   }
 
-  console.log('✅ Environment validation passed');
+  logger.info('✅ Environment validation passed');
 }
 
 // Validate immediately when this module is imported

@@ -6,6 +6,7 @@
 
 import { croweCodeAutonomousAgent } from '../ai/autonomous-agent';
 import { croweCodeMCPManager } from '../marketplace/kilocode-integration';
+import logger from '../logger';
 
 export interface CodeAnalysisProject {
   id: string;
@@ -602,7 +603,7 @@ class CroweCodeAnalysisEngine {
     const projectId = this.generateProjectId();
     const startTime = new Date();
 
-    console.log(`Starting analysis of project: ${projectPath}`);
+    logger.info(`Starting analysis of project: ${projectPath}`);
 
     try {
       // Initialize project
@@ -630,7 +631,7 @@ class CroweCodeAnalysisEngine {
 
       // Discover and analyze files
       const files = await this.discoverFiles(projectPath, configuration);
-      console.log(`Found ${files.length} files to analyze`);
+      logger.info(`Found ${files.length} files to analyze`);
 
       // Analyze files in parallel
       const fileAnalysisPromises = files.map(file => this.analyzeFile(file, configuration));
@@ -689,11 +690,11 @@ class CroweCodeAnalysisEngine {
       project.analysisHistory.push(analysisRun);
       project.lastAnalyzed = new Date();
 
-      console.log(`Analysis completed for project: ${projectId}`);
+      logger.info(`Analysis completed for project: ${projectId}`);
       return projectId;
 
     } catch (error) {
-      console.error(`Analysis failed for project: ${projectPath}`, error);
+      logger.error(`Analysis failed for project: ${projectPath}`, error);
       throw error;
     }
   }
@@ -712,7 +713,7 @@ class CroweCodeAnalysisEngine {
       throw new Error(`No analyzer available for language: ${language}`);
     }
 
-    console.log(`Analyzing file: ${filePath}`);
+    logger.info(`Analyzing file: ${filePath}`);
 
     const fileContent = await this.readFile(filePath);
     const fileStats = await this.getFileStats(filePath);
@@ -759,7 +760,7 @@ class CroweCodeAnalysisEngine {
       throw new Error('Refactoring suggestion not found');
     }
 
-    console.log(`Applying refactoring: ${suggestion.title}`);
+    logger.info(`Applying refactoring: ${suggestion.title}`);
 
     try {
       const result = await this.refactoringEngine.applyRefactoring(
@@ -788,7 +789,7 @@ class CroweCodeAnalysisEngine {
       return result;
 
     } catch (error) {
-      console.error(`Refactoring failed: ${suggestion.title}`, error);
+      logger.error(`Refactoring failed: ${suggestion.title}`, error);
       throw error;
     }
   }

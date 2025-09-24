@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCroweCoderAgent } from "@/lib/claude-agent";
+import logger from '../../../lib/logger';
 
 // Initialize Crowe Coder Agent
 let agent: ReturnType<typeof createCroweCoderAgent> | null = null;
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
           success: true
         });
       } catch (error: any) {
-        console.error(`Capability ${capability} error:`, error);
+        logger.error(`Capability ${capability} error:`, error);
         return NextResponse.json({
           error: `Failed to execute ${capability}: ${error.message}`,
           success: false
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error: any) {
-    console.error("Crowe Coder Agent error:", error);
+    logger.error("Crowe Coder Agent error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to process request" },
       { status: 500 }

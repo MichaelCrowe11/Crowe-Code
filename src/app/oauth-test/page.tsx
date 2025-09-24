@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 import dynamic from "next/dynamic";
+import logger from '../../lib/logger';
 import {
   Github,
   Mail,
@@ -54,7 +55,7 @@ function OAuthTestPageContent() {
       const res = await getProviders();
       setProviders(res);
     } catch (err) {
-      console.error("Failed to load providers:", err);
+      logger.error("Failed to load providers:", err);
     }
   };
 
@@ -109,9 +110,9 @@ function OAuthTestPageContent() {
       const result = await signIn(providerId, {
         callbackUrl: window.location.origin + "/dashboard",
       });
-      console.log("Sign in result:", result);
+      logger.info("Sign in result:", result);
     } catch (error) {
-      console.error("Sign in error:", error);
+      logger.error("Sign in error:", error);
       setError(`Sign in failed: ${error}`);
     }
   };

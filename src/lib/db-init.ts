@@ -1,4 +1,5 @@
 import { prisma } from './database';
+import logger from './logger';
 
 export async function initializeDatabase() {
   try {
@@ -46,9 +47,9 @@ export async function initializeDatabase() {
       );
     `;
 
-    console.log('✅ Database tables initialized');
+    logger.info('✅ Database tables initialized');
   } catch (error) {
-    console.error('Database initialization error:', error);
+    logger.error('Database initialization error:', error);
     // Don't throw - let the app continue
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { LRUCache } from 'lru-cache'
 import { createHash } from 'crypto'
+import logger from '../lib/logger';
 
 // Rate limiting configuration
 interface RateLimitConfig {
@@ -116,7 +117,7 @@ class DistributedRateLimiter {
       const { Redis } = await import('ioredis')
       this.redisClient = new Redis(process.env.REDIS_URL!)
     } catch (error) {
-      console.error('Redis initialization failed:', error)
+      logger.error('Redis initialization failed:', error)
     }
   }
   
@@ -138,7 +139,7 @@ class DistributedRateLimiter {
       const results = await multi.exec()
       return results[0][1] as number
     } catch (error) {
-      console.error('Redis rate limit error:', error)
+      logger.error('Redis rate limit error:', error)
       return this.incrementLocal(key, windowMs)
     }
   }

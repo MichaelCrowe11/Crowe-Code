@@ -1,5 +1,5 @@
 /**
- * Main Middleware for Crowe Logic Platform
+ * Main Middleware for CroweCode Platform
  * Handles security headers and basic request validation
  */
 
@@ -37,7 +37,7 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
   
   // Add request ID for tracing
   response.headers.set('x-request-id', crypto.randomUUID());
-  response.headers.set('x-powered-by', 'Crowe Logic Platform');
+  response.headers.set('x-powered-by', 'CroweCode Platform');
   
   return response;
 }

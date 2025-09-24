@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import logger from '../lib/logger';
 import { 
   Container,
   Play,
@@ -142,7 +143,7 @@ export default function DockerPanel() {
 
       setDockerAvailable(true);
     } catch (error) {
-      console.error('Failed to load Docker data:', error);
+      logger.error('Failed to load Docker data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -167,7 +168,7 @@ export default function DockerPanel() {
         await loadDockerData();
       }
     } catch (error) {
-      console.error(`Failed to ${action} container:`, error);
+      logger.error(`Failed to ${action} container:`, error);
     } finally {
       setIsLoading(false);
     }
@@ -186,7 +187,7 @@ export default function DockerPanel() {
         await loadDockerData();
       }
     } catch (error) {
-      console.error('Failed to run image:', error);
+      logger.error('Failed to run image:', error);
     } finally {
       setIsLoading(false);
     }

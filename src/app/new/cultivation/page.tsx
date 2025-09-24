@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Leaf, Package, Calendar, AlertCircle, ChevronRight, CheckCircle } from "lucide-react";
+import logger from '../../../lib/logger';
 
 export default function NewCultivationPage() {
   const [step, setStep] = useState(1);
@@ -39,7 +40,7 @@ export default function NewCultivationPage() {
 
   const handleSubmit = () => {
     // Handle form submission
-    console.log('Submitting cultivation batch:', formData);
+    logger.info('Submitting cultivation batch:', formData);
   };
 
   return (

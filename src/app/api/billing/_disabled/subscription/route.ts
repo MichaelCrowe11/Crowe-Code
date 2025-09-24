@@ -10,6 +10,7 @@ import {
   updateSubscription 
 } from '@/lib/billing/stripe';
 import { z } from 'zod';
+import logger from '../../../../../lib/logger';
 
 // GET current subscription
 export async function GET(req: NextRequest) {
@@ -77,7 +78,7 @@ export async function GET(req: NextRequest) {
       stripeSubscription,
     });
   } catch (error) {
-    console.error('Get subscription error:', error);
+    logger.error('Get subscription error:', error);
     return NextResponse.json(
       { error: 'Failed to get subscription' },
       { status: 500 }
@@ -218,7 +219,7 @@ export async function PATCH(req: NextRequest) {
       subscription: result,
     });
   } catch (error) {
-    console.error('Update subscription error:', error);
+    logger.error('Update subscription error:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

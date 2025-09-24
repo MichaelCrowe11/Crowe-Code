@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { verifyWebhookSignature } from '@/lib/billing/stripe';
 import Stripe from 'stripe';
+import logger from '../../../../../lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     try {
       event = verifyWebhookSignature(body, signature);
     } catch (err) {
-      console.error('Webhook signature verification failed:', err);
+      logger.error('Webhook signature verification failed:', err);
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
@@ -82,12 +83,12 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.info(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook processing error:', error);
+    logger.error('Webhook processing error:', error);
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }
@@ -101,7 +102,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   });
 
   if (!customer) {
-    console.error('Customer not found for subscription:', subscription.id);
+    logger.error('Customer not found for subscription:', subscription.id);
     return;
   }
 

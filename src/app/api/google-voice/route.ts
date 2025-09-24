@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { googleSpeechProvider } from "@/lib/google-speech-provider";
+import logger from '../../../lib/logger';
 
 /**
  * Google Cloud Speech API Route
@@ -159,7 +160,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Google Voice API error:", error);
+    logger.error("Google Voice API error:", error);
     return NextResponse.json(
       { error: "Voice service error. Please try again later." },
       { status: 500 }

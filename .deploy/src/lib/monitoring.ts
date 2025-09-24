@@ -1,5 +1,5 @@
 /**
- * Monitoring and Observability for Crowe Logic Platform
+ * Monitoring and Observability for CroweCode Platform
  * Integrates with DataDog, Sentry, and custom metrics
  */
 

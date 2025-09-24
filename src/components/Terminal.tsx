@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Terminal as TerminalIcon, X, Plus, Maximize2, Minimize2 } from "lucide-react";
+import logger from '../lib/logger';
 
 interface TerminalProps {
   aiAssistant?: string;
@@ -117,7 +118,7 @@ export default function Terminal({ aiAssistant, sessionId = "default" }: Termina
       const text = await navigator.clipboard.readText();
       setCommand(prev => prev + text);
     } catch (err) {
-      console.error("Failed to read clipboard");
+      logger.error("Failed to read clipboard");
     }
   };
 

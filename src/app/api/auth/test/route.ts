@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/database';
 import { hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
+import logger from '../../../../lib/logger';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'crowe-logic-secret-key-change-in-production';
 
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
     }
 
   } catch (error: any) {
-    console.error('Auth test error:', error);
+    logger.error('Auth test error:', error);
     return NextResponse.json({
       success: false,
       message: 'Internal server error',

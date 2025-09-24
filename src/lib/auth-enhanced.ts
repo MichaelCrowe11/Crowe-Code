@@ -3,6 +3,7 @@ import { sign, verify, JwtPayload } from 'jsonwebtoken'
 import { prisma } from './database'
 import { randomBytes, createHash } from 'crypto'
 import { z } from 'zod'
+import logger from './logger';
 
 // Enhanced security configuration
 const getJWTSecret = (): string => {
@@ -161,7 +162,7 @@ export function verifyAccessToken(token: string): UserPayload | null {
     
     return payload
   } catch (error) {
-    console.error('Token verification failed:', error)
+    logger.error('Token verification failed:', error)
     return null
   }
 }
@@ -499,7 +500,7 @@ async function logSecurityEvent(
       }
     })
   } catch (error) {
-    console.error('Failed to log security event:', error)
+    logger.error('Failed to log security event:', error)
   }
 }
 

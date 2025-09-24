@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Redis } from 'ioredis';
+import logger from '../lib/logger';
 
 // Initialize Redis client
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
@@ -116,7 +117,7 @@ export async function checkRateLimit(
     
     if (!results) {
       // Redis error, allow request but log
-      console.error('Rate limit check failed, allowing request');
+      logger.error('Rate limit check failed, allowing request');
       return { allowed: true, remaining: config.maxRequests, resetAt: new Date(now + config.windowMs) };
     }
     
@@ -132,7 +133,7 @@ export async function checkRateLimit(
     
     return { allowed, remaining, resetAt };
   } catch (error) {
-    console.error('Rate limit error:', error);
+    logger.error('Rate limit error:', error);
     // On error, allow request but log for monitoring
     return { allowed: true, remaining: config.maxRequests, resetAt: new Date(now + config.windowMs) };
   }
@@ -240,7 +241,7 @@ export class SlidingWindowRateLimiter {
       await multi.exec();
       return true;
     } catch (error) {
-      console.error('Sliding window rate limit error:', error);
+      logger.error('Sliding window rate limit error:', error);
       return true; // Allow on error
     }
   }
@@ -306,7 +307,7 @@ export class TokenBucketRateLimiter {
       
       return result === 1;
     } catch (error) {
-      console.error('Token bucket error:', error);
+      logger.error('Token bucket error:', error);
       return true; // Allow on error
     }
   }

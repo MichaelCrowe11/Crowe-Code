@@ -1,5 +1,5 @@
 /**
- * Compression Middleware for Crowe Logic Platform
+ * Compression Middleware for CroweCode Platform
  * Implements Brotli and Gzip compression for optimal performance
  */
 

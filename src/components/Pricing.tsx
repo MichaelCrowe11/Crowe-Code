@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Check, X, Sparkles, Zap, Shield, Crown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import logger from '../lib/logger';
 
 interface PricingPlan {
   id: string;
@@ -145,7 +146,7 @@ export default function Pricing() {
         window.location.href = url;
       }
     } catch (error) {
-      console.error("Error starting checkout:", error);
+      logger.error("Error starting checkout:", error);
       alert("Failed to start checkout. Please try again.");
     } finally {
       setLoading(null);

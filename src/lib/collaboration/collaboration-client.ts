@@ -128,7 +128,7 @@ export class CollaborationClient {
   }
 
   private handleConnectionStatus(status: string) {
-    console.log('Collaboration status:', status);
+    logger.info('Collaboration status:', status);
 
     if (status === 'disconnected') {
       this.scheduleReconnect();
@@ -141,12 +141,12 @@ export class CollaborationClient {
   }
 
   private handleSync(isSynced: boolean) {
-    console.log('Document synced:', isSynced);
+    logger.info('Document synced:', isSynced);
     this.emit('sync', isSynced);
   }
 
   private handleError(error: any) {
-    console.error('Collaboration error:', error);
+    logger.error('Collaboration error:', error);
     this.emit('error', error);
     this.scheduleReconnect();
   }
@@ -419,6 +419,7 @@ export class CollaborationClient {
 
 // React hook for collaboration
 import { useEffect, useRef, useState } from 'react';
+import logger from '../logger';
 
 export function useCollaboration(
   editor: monaco.editor.IStandaloneCodeEditor | null,

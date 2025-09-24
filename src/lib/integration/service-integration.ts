@@ -12,6 +12,7 @@ import { croweCodeCollaboration } from '../collaboration/real-time-collaboration
 import { croweCodePipelineManager } from '../ci-cd/pipeline-integration';
 import { croweCodeAnalysisEngine } from '../analysis/code-analysis-engine';
 import { croweCodeDeploymentManager } from '../deployment/deployment-manager';
+import logger from '../logger';
 
 export interface CroweCodePlatform {
   id: string;
@@ -813,7 +814,7 @@ class CroweCodeServiceIntegration {
     // Set up event listeners
     this.setupEventListeners();
 
-    console.log('CroweCode Service Integration initialized');
+    logger.info('CroweCode Service Integration initialized');
   }
 
   private setupEventListeners(): void {
@@ -989,7 +990,7 @@ class CroweCodeServiceIntegration {
       throw new Error(`Workflow ${workflowName} not found`);
     }
 
-    console.log(`Executing workflow: ${workflowName}`);
+    logger.info(`Executing workflow: ${workflowName}`);
 
     const result: WorkflowResult = {
       workflowId: this.generateWorkflowId(),
@@ -1258,17 +1259,17 @@ class CroweCodeServiceIntegration {
   // Configuration update methods
   private async updateAIConfiguration(configuration: any): Promise<void> {
     // Update AI service configuration
-    console.log('Updating AI configuration:', configuration);
+    logger.info('Updating AI configuration:', configuration);
   }
 
   private async updateCollaborationConfiguration(configuration: any): Promise<void> {
     // Update collaboration service configuration
-    console.log('Updating collaboration configuration:', configuration);
+    logger.info('Updating collaboration configuration:', configuration);
   }
 
   private async updateAnalysisConfiguration(configuration: any): Promise<void> {
     // Update analysis service configuration
-    console.log('Updating analysis configuration:', configuration);
+    logger.info('Updating analysis configuration:', configuration);
   }
 
   // Health checks and metrics
@@ -1562,7 +1563,7 @@ class EventBus {
       try {
         callback(data);
       } catch (error) {
-        console.error(`Error in event listener for ${event}:`, error);
+        logger.error(`Error in event listener for ${event}:`, error);
       }
     });
   }
@@ -1622,7 +1623,7 @@ class MetricsCollector {
 
   updateServiceMetrics(serviceName: string, services: ServiceRegistry): void {
     // Update service-specific metrics
-    console.log(`Updating metrics for service: ${serviceName}`);
+    logger.info(`Updating metrics for service: ${serviceName}`);
   }
 }
 

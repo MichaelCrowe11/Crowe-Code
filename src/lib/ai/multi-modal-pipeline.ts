@@ -4,6 +4,7 @@
  */
 
 import { AIProviderManager } from '@/lib/ai-provider';
+import logger from '../logger';
 
 export interface MultiModalInput {
   id: string;
@@ -229,7 +230,7 @@ export class MultiModalAIPipeline {
       }
 
     } catch (error) {
-      console.error('Error in multi-modal processing:', error);
+      logger.error('Error in multi-modal processing:', error);
       throw new Error(`Multi-modal processing failed: ${error.message}`);
     }
   }
@@ -301,7 +302,7 @@ export class MultiModalAIPipeline {
         stageResults.set(stage.id, result);
         results.push(result);
       } catch (error) {
-        console.error(`Pipeline stage ${stage.id} failed:`, error);
+        logger.error(`Pipeline stage ${stage.id} failed:`, error);
         // Continue with next stage or fail based on pipeline config
       }
     }

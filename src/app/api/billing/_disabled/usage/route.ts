@@ -5,6 +5,7 @@ import { getServerSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { recordUsage } from '@/lib/billing/stripe';
 import { z } from 'zod';
+import logger from '../../../../../lib/logger';
 
 // GET usage statistics
 export async function GET(req: NextRequest) {
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
       tier: subscription?.tier || 'FREE',
     });
   } catch (error) {
-    console.error('Get usage error:', error);
+    logger.error('Get usage error:', error);
     return NextResponse.json(
       { error: 'Failed to get usage data' },
       { status: 500 }
@@ -234,7 +235,7 @@ export async function POST(req: NextRequest) {
       usageRecord,
     });
   } catch (error) {
-    console.error('Record usage error:', error);
+    logger.error('Record usage error:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

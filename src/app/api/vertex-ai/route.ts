@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { vertexAIProvider } from "@/lib/vertex-ai-provider";
+import logger from '../../../lib/logger';
 
 /**
  * Vertex AI API Route
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       try {
         vertexAIProvider.switchModel(model);
       } catch (error) {
-        console.error("Failed to switch model:", error);
+        logger.error("Failed to switch model:", error);
       }
     }
 
@@ -156,7 +157,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Vertex AI API error:", error);
+    logger.error("Vertex AI API error:", error);
     return NextResponse.json(
       { error: "Vertex AI service error. Please try again later." },
       { status: 500 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/nextauth-config";
 import { prisma } from "@/lib/prisma";
+import logger from '../../../../lib/logger';
 
 // GET /api/user/usage - Get user's usage statistics
 export async function GET(req: NextRequest) {
@@ -220,7 +221,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(usage);
   } catch (error) {
-    console.error("Error fetching usage statistics:", error);
+    logger.error("Error fetching usage statistics:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -315,7 +316,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "Usage tracked successfully" });
   } catch (error) {
-    console.error("Error tracking usage:", error);
+    logger.error("Error tracking usage:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

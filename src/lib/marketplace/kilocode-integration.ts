@@ -1,3 +1,4 @@
+import logger from '../logger';
 /**
  * CroweCode™ KiloCode Integration Layer
  * Implements KiloCode's MCP (Model Context Protocol) architecture
@@ -221,11 +222,11 @@ class CroweCodeMCPManager {
       this.capabilities.set(serverConfig.name, serverConfig.capabilities);
       this.servers.set(serverConfig.name, serverInstance);
 
-      console.log(`MCP Server registered: ${serverConfig.name}`);
+      logger.info(`MCP Server registered: ${serverConfig.name}`);
       return true;
 
     } catch (error) {
-      console.error(`Failed to register MCP server ${serverConfig.name}:`, error);
+      logger.error(`Failed to register MCP server ${serverConfig.name}:`, error);
       return false;
     }
   }
@@ -381,19 +382,19 @@ class MCPServerInstance {
           const message = JSON.parse(messageStr);
           this.handleMessage(message);
         } catch (error) {
-          console.error('Failed to parse MCP message:', error);
+          logger.error('Failed to parse MCP message:', error);
         }
       }
     });
 
     this.process.stderr.on('data', (data: Buffer) => {
-      console.error(`MCP Server ${this.config.name} error:`, data.toString());
+      logger.error(`MCP Server ${this.config.name} error:`, data.toString());
     });
   }
 
   private handleMessage(message: MCPMessage | MCPResponse): void {
     // Handle incoming messages from MCP server
-    console.log(`Message from ${this.config.name}:`, message);
+    logger.info(`Message from ${this.config.name}:`, message);
   }
 
   async executeTool(toolName: string, parameters: any): Promise<any> {
@@ -466,7 +467,7 @@ class MCPSecurityManager {
 class MCPAuditLogger {
   async logToolExecution(logEntry: AuditLogEntry): Promise<void> {
     // Implement audit logging
-    console.log('Audit log:', logEntry);
+    logger.info('Audit log:', logEntry);
   }
 }
 

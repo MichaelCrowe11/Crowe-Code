@@ -5,6 +5,7 @@
 
 import { GoogleAuth } from 'google-auth-library';
 import { VertexAI, HarmCategory, HarmBlockThreshold } from '@google-cloud/vertexai';
+import logger from './logger';
 
 export interface VertexAIConfig {
   projectId: string;
@@ -137,9 +138,9 @@ class VertexAIProviderManager {
         }
       });
 
-      console.log('Vertex AI initialized successfully');
+      logger.info('Vertex AI initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize Vertex AI:', error);
+      logger.error('Failed to initialize Vertex AI:', error);
     }
   }
 
@@ -157,7 +158,7 @@ class VertexAIProviderManager {
     const model = MODEL_GARDEN_CATALOG.find(m => m.id === modelId);
     if (model) {
       this.currentModel = modelId;
-      console.log(`Switched to model: ${model.name}`);
+      logger.info(`Switched to model: ${model.name}`);
     } else {
       throw new Error(`Model ${modelId} not found in catalog`);
     }

@@ -1,3 +1,4 @@
+import logger from './logger';
 /**
  * CroweCode™ Proprietary AI Provider Abstraction Layer
  * Enhanced with multi-model support and advanced capabilities
@@ -246,7 +247,7 @@ class AIProviderManager {
         return result;
       } catch (error) {
         this.usageTracker.logError(providerKey, error);
-        console.warn(`Provider ${providerKey} failed, trying next:`, error);
+        logger.warn(`Provider ${providerKey} failed, trying next:`, error);
         continue;
       }
     }

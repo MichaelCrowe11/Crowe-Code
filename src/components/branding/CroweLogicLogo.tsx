@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import Image from 'next/image';
 
@@ -35,7 +37,7 @@ export default function CroweLogicLogo({
         )}
         <Image
           src="/crowe-avatar.png"
-          alt="Crowe Logic"
+          alt="CroweCode"
           width={imageSize}
           height={imageSize}
           className={`relative rounded-lg ${
@@ -50,7 +52,7 @@ export default function CroweLogicLogo({
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <span className={`font-bold ${textSize} bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent`}>
-              Crowe Logic
+              CroweCode
             </span>
             {size !== 'xs' && (
               <span className={`${size === 'sm' ? 'text-[10px]' : 'text-xs'} px-2 py-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-full text-blue-300`}>

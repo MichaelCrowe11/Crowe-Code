@@ -1,5 +1,5 @@
 /**
- * Health Check Endpoint for Crowe Logic Platform
+ * Health Check Endpoint for CroweCode Platform
  * Returns system status for monitoring and load balancers
  */
 
@@ -11,7 +11,7 @@ export async function GET() {
   const healthStatus = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'Crowe Logic Platform',
+  service: 'CroweCode',
     version: process.env.npm_package_version || '1.0.0',
     uptime: Math.floor(process.uptime()),
     environment: process.env.NODE_ENV || 'development',

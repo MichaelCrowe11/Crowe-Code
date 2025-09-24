@@ -9,6 +9,7 @@ import {
 } from '@/lib/billing/stripe';
 import { PRICING_TIERS, getTrialPeriodDays } from '@/lib/billing/pricing-config';
 import { z } from 'zod';
+import logger from '../../../../../lib/logger';
 
 const checkoutSchema = z.object({
   tierId: z.enum(['developer', 'team', 'enterprise']),
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest) {
       url: checkoutSession.url,
     });
   } catch (error) {
-    console.error('Checkout session creation error:', error);
+    logger.error('Checkout session creation error:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

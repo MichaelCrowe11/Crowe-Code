@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { aiProviderManager } from "@/lib/ai-provider";
+import logger from '../../../lib/logger';
 
 /**
  * CroweCode™ Proprietary AI API
@@ -94,7 +95,7 @@ Format the response as JSON with these fields:
       });
 
       if (!response.ok) {
-        console.error("AI Provider error:", response.status);
+        logger.error("AI Provider error:", response.status);
         return NextResponse.json(
           { error: "CroweCode Intelligence temporarily unavailable" },
           { status: 503 }
@@ -126,7 +127,7 @@ Format the response as JSON with these fields:
           });
         }
       } catch (parseError) {
-        console.error("Error parsing analysis response:", parseError);
+        logger.error("Error parsing analysis response:", parseError);
         let fallbackContent;
         if (isAnthropicAPI) {
           fallbackContent = data.content[0].text;
@@ -200,7 +201,7 @@ Format the response as JSON with these fields:
     });
 
     if (!response.ok) {
-      console.error("Provider error:", response.status);
+      logger.error("Provider error:", response.status);
       return NextResponse.json(
         { error: "CroweCode Intelligence is experiencing high demand. Please try again." },
         { status: 503 }
@@ -228,7 +229,7 @@ Format the response as JSON with these fields:
       }
     });
   } catch (error) {
-    console.error("Internal error:", error);
+    logger.error("Internal error:", error);
     return NextResponse.json(
       { error: "CroweCode Intelligence service error. Our team has been notified." },
       { status: 500 }

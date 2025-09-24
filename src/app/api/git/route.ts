@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
+import logger from '../../../lib/logger';
 
 const execAsync = promisify(exec);
 
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
       });
     }
   } catch (error: any) {
-    console.error("Git API error:", error);
+    logger.error("Git API error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to execute git command" },
       { status: 500 }
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error: any) {
-    console.error("Git API error:", error);
+    logger.error("Git API error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to execute git command" },
       { status: 500 }

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { rateLimitMiddleware } from './middleware/rate-limiter'
 import { verifyAccessToken } from './lib/auth-enhanced'
 import { createHash } from 'crypto'
+import logger from './lib/logger';
 
 // Middleware configuration
 export const config = {
@@ -119,7 +120,7 @@ async function sendToMonitoring(metrics: RequestMetrics): Promise<void> {
       // await sendToDataDog(metrics)
     }
   } catch (error) {
-    console.error('Failed to send metrics:', error)
+    logger.error('Failed to send metrics:', error)
   }
 }
 
@@ -447,7 +448,7 @@ export async function middleware(request: NextRequest) {
     
     return finalResponse
   } catch (error) {
-    console.error('Middleware error:', error)
+    logger.error('Middleware error:', error)
     
     // Log error
     logRequestMetrics({

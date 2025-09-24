@@ -3,6 +3,7 @@ export const runtime = 'nodejs'; // Required for file system operations
 
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/withAuth';
+import logger from '../../../lib/logger';
 import { 
   safeReadFile, 
   safeWriteFile, 
@@ -82,7 +83,7 @@ export const GET = withAuth(async (req) => {
       );
     }
 
-    console.error('File API GET error:', error);
+    logger.error('File API GET error:', error);
     return NextResponse.json(
       { 
         error: 'Internal server error',
@@ -176,7 +177,7 @@ export const POST = withAuth(async (req) => {
       );
     }
 
-    console.error('File API POST error:', error);
+    logger.error('File API POST error:', error);
     return NextResponse.json(
       { 
         error: 'Internal server error',

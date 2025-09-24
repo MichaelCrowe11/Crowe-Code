@@ -1,5 +1,5 @@
 /**
- * Caching Middleware for Crowe Logic Platform
+ * Caching Middleware for CroweCode Platform
  * Implements multiple caching strategies for optimal performance
  */
 

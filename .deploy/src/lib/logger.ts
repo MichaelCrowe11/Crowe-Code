@@ -1,5 +1,5 @@
 /**
- * Logging utility for Crowe Logic Platform
+ * Logging utility for CroweCode Platform
  * Provides structured logging with multiple transports
  */
 

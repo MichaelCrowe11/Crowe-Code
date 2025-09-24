@@ -1,12 +1,13 @@
-// Site configuration for Crowe Logic Platform
+// Site configuration for CroweCode Platform
 export const siteConfig = {
-  name: "Crowe Logic Platform",
-  title: "Crowe Logic - Intelligent Development Platform",
-  description: "The most advanced AI-powered development platform. Build, deploy, and scale with intelligence using Crowe Logic's cutting-edge technology.",
-  url: "https://crowecode.com",
-  ogImage: "https://crowecode.com/og.png",
+  name: "CroweCode",
+  title: "CroweCode – Code, Ship, and Scale Intelligently",
+  description: "A unique, code-native AI development space. Build, deploy, and scale with precision in a codespace crafted for creators.",
+  url: "https://www.crowecode.com",
+  ogImage: "/og.svg",
   keywords: [
-    "crowe logic",
+    "crowecode",
+    "crowe code",
     "intelligent ide",
     "ai development platform",
     "cloud ide",
@@ -15,19 +16,17 @@ export const siteConfig = {
     "collaborative development",
     "github integration",
     "web development",
-    "crowe code",
-    "crowecode",
     "machine learning ide",
     "quantum computing platform"
   ],
   links: {
-    github: "https://github.com/MichaelCrowe11/crowe-logic-platform",
+    github: "https://github.com/MichaelCrowe11/Crowe-Code",
     twitter: "https://twitter.com/crowecode",
     discord: "https://discord.gg/crowecode",
-    docs: "https://docs.crowecode.com"
+  docs: "https://docs.crowecode.com"
   },
   creator: "Michael Crowe",
-  company: "Crowe Logic",
+  company: "CroweCode",
   features: {
     ai: {
       enabled: true,
@@ -58,20 +57,20 @@ export const siteConfig = {
     timeout: 30000
   },
   branding: {
-    primaryColor: "#3B82F6", // Blue
-    secondaryColor: "#8B5CF6", // Purple
-    accentColor: "#10B981", // Emerald
-    gradientStart: "#3B82F6",
-    gradientEnd: "#8B5CF6",
+    primaryColor: "#4F46E5", // Indigo 600
+    secondaryColor: "#06B6D4", // Cyan 500
+    accentColor: "#22C55E", // Emerald 500
+    gradientStart: "#06B6D4",
+    gradientEnd: "#4F46E5",
     darkBg: "#09090B", // zinc-950
     lightBg: "#FAFAFA",
     logo: {
-      light: "/crowe-avatar.png",
-      dark: "/crowe-avatar.png",
-      favicon: "/favicon.ico",
-      full: "/crowe-logo-full.png"
+  light: "/crowecode-wordmark.svg",
+  dark: "/crowecode-wordmark.svg",
+  favicon: "/favicon.svg",
+  full: "/crowecode-wordmark.svg"
     },
-    tagline: "Intelligent Development Environment"
+    tagline: "The Codespace for Builders"
   },
   social: {
     twitter: "@crowecode",

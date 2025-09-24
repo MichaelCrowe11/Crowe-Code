@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/nextauth-config";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import logger from '../../../lib/logger';
 
 const createProjectSchema = z.object({
   name: z.string().min(1).max(100),
@@ -79,7 +80,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(formattedProjects);
   } catch (error) {
-    console.error("Error fetching projects:", error);
+    logger.error("Error fetching projects:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -170,7 +171,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("Error creating project:", error);
+    logger.error("Error creating project:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -241,7 +242,7 @@ export async function getProject(req: NextRequest, { params }: { params: { id: s
       updatedAt: project.updatedAt,
     });
   } catch (error) {
-    console.error("Error fetching project:", error);
+    logger.error("Error fetching project:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -314,7 +315,7 @@ export async function updateProject(req: NextRequest, { params }: { params: { id
       message: "Project updated successfully",
     });
   } catch (error) {
-    console.error("Error updating project:", error);
+    logger.error("Error updating project:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -368,7 +369,7 @@ export async function deleteProject(req: NextRequest, { params }: { params: { id
 
     return NextResponse.json({ message: "Project deleted successfully" });
   } catch (error) {
-    console.error("Error deleting project:", error);
+    logger.error("Error deleting project:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

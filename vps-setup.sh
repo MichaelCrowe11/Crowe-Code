@@ -72,7 +72,7 @@ if [ ! -f .env.production ]; then
     cat > .env.production << 'EOF'
 # Production Environment
 NODE_ENV=production
-NEXTAUTH_URL=https://crowecode.com
+NEXTAUTH_URL=https://www.crowecode.com
 NEXTAUTH_SECRET=$(openssl rand -base64 32)
 JWT_SECRET=$(openssl rand -base64 32)
 

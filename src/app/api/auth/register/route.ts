@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, generateToken } from '@/lib/auth'
 import { initializeDatabase } from '@/lib/db-init'
+import logger from '../../../../lib/logger';
 
 let dbInitialized = false;
 
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
     
     return response
   } catch (error: any) {
-    console.error('Registration error:', error)
+    logger.error('Registration error:', error)
     
     if (error.code === 'P2002') {
       return NextResponse.json(

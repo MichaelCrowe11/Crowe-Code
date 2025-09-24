@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { contaminationDetector } from '@/lib/mycology/contamination-detection';
+import logger from '../../../../lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error analyzing contamination:', error);
+    logger.error('Error analyzing contamination:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to analyze contamination' },
       { status: 500 }
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching contamination trends:', error);
+    logger.error('Error fetching contamination trends:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch contamination trends' },
       { status: 500 }

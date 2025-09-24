@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Server as SocketIOServer } from 'socket.io';
 import { createServer } from 'http';
+import logger from '../../../lib/logger';
 
 interface CollaborationRoom {
   id: string;
@@ -60,7 +61,7 @@ class CollaborationService {
     });
 
     this.io.on('connection', (socket) => {
-      console.log('Client connected:', socket.id);
+      logger.info('Client connected:', socket.id);
 
       socket.on('join-room', ({ roomId, user }) => {
         this.handleJoinRoom(socket, roomId, user);
@@ -279,7 +280,7 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('Collaboration error:', error);
+    logger.error('Collaboration error:', error);
     return NextResponse.json(
       { error: 'Collaboration service error' },
       { status: 500 }

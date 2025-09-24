@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/nextauth-config";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import logger from '../../../../lib/logger';
 
 const updateProfileSchema = z.object({
   name: z.string().min(1).max(100).optional(),
@@ -92,7 +93,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    logger.error("Error fetching user profile:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -165,7 +166,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    console.error("Error updating user profile:", error);
+    logger.error("Error updating user profile:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

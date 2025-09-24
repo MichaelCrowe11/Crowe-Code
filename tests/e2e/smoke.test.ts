@@ -5,7 +5,7 @@ test.describe('Smoke Tests @smoke', () => {
     await page.goto('/');
     
     // Check title
-    await expect(page).toHaveTitle(/Crowe Logic/);
+  await expect(page).toHaveTitle(/CroweCode/);
     
     // Check main heading is visible
     const heading = page.locator('h1').first();

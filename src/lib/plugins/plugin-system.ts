@@ -1,5 +1,6 @@
 import type { editor, languages } from 'monaco-editor';
 import { EventEmitter } from 'events';
+import logger from '../logger';
 
 // Plugin Types and Interfaces
 export interface CrowePlugin {
@@ -315,7 +316,7 @@ export class PluginManager extends EventEmitter {
     this.plugins.set(plugin.id, plugin);
     this.emit('pluginRegistered', plugin);
 
-    console.log(`Plugin registered: ${plugin.name} v${plugin.version}`);
+    logger.info(`Plugin registered: ${plugin.name} v${plugin.version}`);
   }
 
   async activatePlugin(pluginId: string): Promise<void> {
@@ -325,7 +326,7 @@ export class PluginManager extends EventEmitter {
     }
 
     if (this.activePlugins.has(pluginId)) {
-      console.warn(`Plugin ${pluginId} is already active`);
+      logger.warn(`Plugin ${pluginId} is already active`);
       return;
     }
 
@@ -342,7 +343,7 @@ export class PluginManager extends EventEmitter {
       this.activePlugins.add(pluginId);
       this.emit('pluginActivated', plugin);
 
-      console.log(`Plugin activated: ${plugin.name}`);
+      logger.info(`Plugin activated: ${plugin.name}`);
     } catch (error) {
       // Cleanup on error
       this.contexts.delete(pluginId);
@@ -357,7 +358,7 @@ export class PluginManager extends EventEmitter {
     }
 
     if (!this.activePlugins.has(pluginId)) {
-      console.warn(`Plugin ${pluginId} is not active`);
+      logger.warn(`Plugin ${pluginId} is not active`);
       return;
     }
 
@@ -377,9 +378,9 @@ export class PluginManager extends EventEmitter {
       this.activePlugins.delete(pluginId);
       this.emit('pluginDeactivated', plugin);
 
-      console.log(`Plugin deactivated: ${plugin.name}`);
+      logger.info(`Plugin deactivated: ${plugin.name}`);
     } catch (error) {
-      console.error(`Error deactivating plugin ${pluginId}:`, error);
+      logger.error(`Error deactivating plugin ${pluginId}:`, error);
     }
   }
 
@@ -504,7 +505,7 @@ export class PluginManager extends EventEmitter {
   private createUIAPI(subscriptions: PluginDisposable[]): PluginUIAPI {
     return {
       showMessage: (message, type) => {
-        console.log(`[${type || 'info'}] ${message}`);
+        logger.info(`[${type || 'info'}] ${message}`);
       },
       showInputBox: async (options) => {
         return prompt(options.prompt, options.value || '') || undefined;

@@ -56,8 +56,8 @@ apt-get install -y docker.io docker-compose certbot nginx
 cp .env.production.example .env.production
 
 # Update environment for crowecode.com
-sed -i 's/NEXTAUTH_URL=.*/NEXTAUTH_URL=https:\/\/crowecode.com/' .env.production
-sed -i 's/NEXT_PUBLIC_APP_URL=.*/NEXT_PUBLIC_APP_URL=https:\/\/crowecode.com/' .env.production
+sed -i 's/NEXTAUTH_URL=.*/NEXTAUTH_URL=https:\/\/www.crowecode.com/' .env.production
+sed -i 's/NEXT_PUBLIC_APP_URL=.*/NEXT_PUBLIC_APP_URL=https:\/\/www.crowecode.com/' .env.production
 
 # Create necessary directories
 mkdir -p uploads credentials ssl backups logs

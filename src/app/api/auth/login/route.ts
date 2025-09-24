@@ -16,6 +16,7 @@ import {
   setSessionCookie,
 } from '@/lib/auth/session';
 import { nanoid } from 'nanoid';
+import logger from '../../../../lib/logger';
 
 /**
  * POST /api/auth/login
@@ -184,7 +185,7 @@ export const POST = withRateLimit(
         },
       });
 
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
 
       return NextResponse.json(
         {

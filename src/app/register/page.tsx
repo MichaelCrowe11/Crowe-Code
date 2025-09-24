@@ -147,7 +147,7 @@ export default function RegisterPage() {
                 <div className="flex items-center gap-3 px-6 py-3">
                   <Brain className="w-8 h-8 text-purple-400" />
                   <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Crowe Logic
+                    CroweCode
                   </span>
                 </div>
               </HolographicDisplay>

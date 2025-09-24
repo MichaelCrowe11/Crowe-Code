@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, MicOff, Volume2, VolumeX, Loader2, Activity } from "lucide-react";
+import logger from '../lib/logger';
 
 interface VoiceAssistantProps {
   onCommand?: (command: string) => void;
@@ -52,7 +53,7 @@ export default function VoiceAssistant({ onCommand, onTranscript, context = 'gen
       };
 
       recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
+        logger.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
 
@@ -143,7 +144,7 @@ export default function VoiceAssistant({ onCommand, onTranscript, context = 'gen
         speak(data.response);
       }
     } catch (error) {
-      console.error('Error processing voice command:', error);
+      logger.error('Error processing voice command:', error);
     }
 
     setIsProcessing(false);
@@ -178,14 +179,14 @@ export default function VoiceAssistant({ onCommand, onTranscript, context = 'gen
               processCommand(data.transcript);
             }
           } catch (error) {
-            console.error('Transcription error:', error);
+            logger.error('Transcription error:', error);
           }
         };
 
         mediaRecorderRef.current.start();
         setIsListening(true);
       } catch (error) {
-        console.error('Microphone access error:', error);
+        logger.error('Microphone access error:', error);
       }
     } else {
       recognitionRef.current.start();

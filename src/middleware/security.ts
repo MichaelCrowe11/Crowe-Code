@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import logger from '../lib/logger';
 
 /**
  * Security configuration
@@ -218,7 +219,7 @@ export function detectAttackPatterns(request: NextRequest): boolean {
   // Check URL
   for (const pattern of attackPatterns) {
     if (pattern.test(url)) {
-      console.warn(`Attack pattern detected in URL: ${url}`);
+      logger.warn(`Attack pattern detected in URL: ${url}`);
       return true;
     }
   }
@@ -235,7 +236,7 @@ export function detectAttackPatterns(request: NextRequest): boolean {
   const lowerAgent = userAgent.toLowerCase();
   for (const agent of badAgents) {
     if (lowerAgent.includes(agent)) {
-      console.warn(`Suspicious user agent detected: ${userAgent}`);
+      logger.warn(`Suspicious user agent detected: ${userAgent}`);
       return true;
     }
   }
@@ -260,7 +261,7 @@ export function recordFailedAttempt(ip: string) {
   // Block IP after 10 failed attempts
   if (attempts >= 10) {
     blockedIPs.add(ip);
-    console.warn(`IP blocked due to suspicious activity: ${ip}`);
+    logger.warn(`IP blocked due to suspicious activity: ${ip}`);
     
     // Auto-unblock after 1 hour
     setTimeout(() => {

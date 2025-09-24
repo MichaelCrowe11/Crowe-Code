@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import logger from '../../../lib/logger';
 
 // Get file tree for a directory
 async function getFileTree(dirPath: string, depth = 0, maxDepth = 3): Promise<any[]> {
@@ -37,7 +38,7 @@ async function getFileTree(dirPath: string, depth = 0, maxDepth = 3): Promise<an
     
     return tree;
   } catch (error) {
-    console.error(`Error reading directory ${dirPath}:`, error);
+    logger.error(`Error reading directory ${dirPath}:`, error);
     return [];
   }
 }
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   } catch (error: any) {
-    console.error("File API error:", error);
+    logger.error("File API error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to process request" },
       { status: 500 }
@@ -165,7 +166,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error: any) {
-    console.error("File API error:", error);
+    logger.error("File API error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to process request" },
       { status: 500 }

@@ -16,13 +16,13 @@ export const siteConfig = {
     "crowecode"
   ],
   links: {
-    github: "https://github.com/MichaelCrowe11/crowe-logic-platform",
+    github: "https://github.com/MichaelCrowe11/Crowe-Code",
     twitter: "https://twitter.com/crowecode",
     discord: "https://discord.gg/crowecode",
     docs: "https://docs.crowecode.com"
   },
   creator: "Michael Crowe",
-  company: "Crowe Logic",
+  company: "CroweCode",
   features: {
     ai: {
       enabled: true,
@@ -53,14 +53,14 @@ export const siteConfig = {
     timeout: 30000
   },
   branding: {
-    primaryColor: "#00ADB5",
-    secondaryColor: "#393E46",
-    accentColor: "#FFD700",
-    darkBg: "#0A0E27",
-    lightBg: "#F7F7F7",
+    primaryColor: "#4F46E5",
+    secondaryColor: "#06B6D4",
+    accentColor: "#22C55E",
+    darkBg: "#09090B",
+    lightBg: "#FAFAFA",
     logo: {
-      light: "/logo-light.svg",
-      dark: "/logo-dark.svg",
+      light: "/crowecode-wordmark.svg",
+      dark: "/crowecode-wordmark.svg",
       favicon: "/favicon.ico"
     }
   },

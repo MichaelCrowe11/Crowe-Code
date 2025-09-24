@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '../../../../lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
-    console.error('Error checking environment:', error);
+    logger.error('Error checking environment:', error);
     return NextResponse.json({
       error: 'Failed to check environment',
       details: error.message

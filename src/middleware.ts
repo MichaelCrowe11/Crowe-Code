@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import logger from './lib/logger';
 
 // Public API routes that don't require authentication
 const PUBLIC_API_ROUTES = [
@@ -81,14 +82,30 @@ export async function middleware(request: NextRequest) {
   }
 
   // For protected routes, check NextAuth session
-  const token = await getToken({
+  const primaryCookie = process.env.NODE_ENV === 'production'
+    ? '__Secure-next-auth.session-token'
+    : 'next-auth.session-token';
+
+  let token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
+    cookieName: primaryCookie,
   });
+
+  if (!token) {
+    token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  }
 
   // Log for debugging (remove in production)
   if (pathname === '/dashboard' && !token) {
-    console.log('No token found for dashboard access');
+    logger.info('No token found for dashboard access');
+  }
+
+  // If hitting login while already authenticated, bounce to callbackUrl or dashboard
+  if ((pathname === '/login' || pathname === '/auth/signin') && token) {
+    const url = new URL(request.url);
+    const callbackUrl = url.searchParams.get('callbackUrl') || '/dashboard';
+    return NextResponse.redirect(new URL(callbackUrl, request.url));
   }
 
   // Handle API routes

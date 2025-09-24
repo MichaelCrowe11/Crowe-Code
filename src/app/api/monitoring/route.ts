@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import os from 'os';
 import { performance } from 'perf_hooks';
+import logger from '../../../lib/logger';
 
 interface SystemMetrics {
   cpu: {
@@ -333,7 +334,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date(),
     });
   } catch (error) {
-    console.error('Monitoring error:', error);
+    logger.error('Monitoring error:', error);
     return NextResponse.json(
       { error: 'Failed to get monitoring data' },
       { status: 500 }
@@ -362,7 +363,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Monitoring record error:', error);
+    logger.error('Monitoring record error:', error);
     return NextResponse.json(
       { error: 'Failed to record monitoring data' },
       { status: 500 }

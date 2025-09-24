@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '../../../../lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching sensor data:', error);
+    logger.error('Error fetching sensor data:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sensor data' },
       { status: 500 }
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error storing sensor data:', error);
+    logger.error('Error storing sensor data:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to store sensor data' },
       { status: 500 }

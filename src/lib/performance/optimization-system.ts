@@ -202,7 +202,7 @@ export class PerformanceOptimizationSystem {
 
       return plugin;
     } catch (error) {
-      console.error(`Failed to load plugin ${pluginId}:`, error);
+      logger.error(`Failed to load plugin ${pluginId}:`, error);
       throw error;
     }
   }
@@ -376,5 +376,6 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 import { useState } from 'react';
+import logger from '../logger';
 
 export default PerformanceOptimizationSystem;

@@ -7,6 +7,7 @@ import { LRUCache } from 'lru-cache'
 import { createHash } from 'crypto'
 import { compress, decompress } from 'zlib'
 import { promisify } from 'util'
+import logger from './logger';
 
 const gzip = promisify(compress)
 const gunzip = promisify(decompress)
@@ -121,14 +122,14 @@ export class CacheService {
       })
       
       this.redisClient.on('error', (error: Error) => {
-        console.error('Redis error:', error)
+        logger.error('Redis error:', error)
       })
       
       this.redisClient.on('connect', () => {
-        console.log('Redis connected')
+        logger.info('Redis connected')
       })
     } catch (error) {
-      console.error('Failed to initialize Redis:', error)
+      logger.error('Failed to initialize Redis:', error)
     }
   }
   
@@ -223,7 +224,7 @@ export class CacheService {
         const data = await this.decompressData(entry.data, entry.metadata.compressed)
         return data as T
       } catch (error) {
-        console.error('Cache decompression error:', error)
+        logger.error('Cache decompression error:', error)
         this.memoryCache.delete(cacheKey)
         return null
       }
@@ -245,7 +246,7 @@ export class CacheService {
           return data as T
         }
       } catch (error) {
-        console.error('Redis get error:', error)
+        logger.error('Redis get error:', error)
         
         // If stale is allowed, try to get from memory cache even if expired
         if (options?.stale) {
@@ -305,7 +306,7 @@ export class CacheService {
             JSON.stringify(entry)
           )
         } catch (error) {
-          console.error('Redis set error:', error)
+          logger.error('Redis set error:', error)
         }
       }
       
@@ -313,7 +314,7 @@ export class CacheService {
       this.stats.itemCount = this.memoryCache.size
       this.stats.size = this.memoryCache.calculatedSize ?? 0
     } catch (error) {
-      console.error('Cache set error:', error)
+      logger.error('Cache set error:', error)
       throw error
     }
   }
@@ -338,7 +339,7 @@ export class CacheService {
       try {
         await this.redisClient.del(cacheKey)
       } catch (error) {
-        console.error('Redis delete error:', error)
+        logger.error('Redis delete error:', error)
       }
     }
     
@@ -385,7 +386,7 @@ export class CacheService {
       try {
         await this.redisClient.flushdb()
       } catch (error) {
-        console.error('Redis clear error:', error)
+        logger.error('Redis clear error:', error)
       }
     }
     
@@ -462,7 +463,7 @@ export class CacheService {
     await Promise.all(
       entries.map(({ key, factory, config }) =>
         this.getOrSet(key, factory, config).catch(error =>
-          console.error(`Cache warm-up failed for key ${key}:`, error)
+          logger.error(`Cache warm-up failed for key ${key}:`, error)
         )
       )
     )
@@ -484,7 +485,7 @@ export class CacheService {
     // Log stats every 5 minutes in development
     if (process.env.NODE_ENV === 'development') {
       setInterval(() => {
-        console.log('Cache stats:', this.getStats())
+        logger.info('Cache stats:', this.getStats())
       }, 5 * 60 * 1000)
     }
   }
@@ -514,17 +515,17 @@ export class EdgeCache {
       // Cloudflare Workers KV
       try {
         // This would be initialized in the edge runtime
-        console.log('Edge caching ready for Cloudflare Workers KV')
+        logger.info('Edge caching ready for Cloudflare Workers KV')
       } catch (error) {
-        console.error('Failed to initialize Cloudflare KV:', error)
+        logger.error('Failed to initialize Cloudflare KV:', error)
       }
     } else if (process.env.EDGE_CONFIG) {
       // Vercel Edge Config
       try {
         const { get } = await import('@vercel/edge-config')
-        console.log('Edge caching ready for Vercel Edge Config')
+        logger.info('Edge caching ready for Vercel Edge Config')
       } catch (error) {
-        console.error('Failed to initialize Vercel Edge Config:', error)
+        logger.error('Failed to initialize Vercel Edge Config:', error)
       }
     }
   }
@@ -548,7 +549,7 @@ export class EdgeCache {
   
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     // Edge caching set operations would be handled through API or build process
-    console.log(`Edge cache set: ${key}`)
+    logger.info(`Edge cache set: ${key}`)
   }
 }
 

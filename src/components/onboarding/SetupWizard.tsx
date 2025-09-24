@@ -25,6 +25,7 @@ import FuturisticButton from "@/components/ui/FuturisticButton";
 import GlassmorphicCard from "@/components/ui/GlassmorphicCard";
 import HolographicDisplay from "@/components/ui/HolographicDisplay";
 import QuantumLoader from "@/components/ui/QuantumLoader";
+import logger from '../../lib/logger';
 
 interface SetupStep {
   id: string;
@@ -181,7 +182,7 @@ export default function SetupWizard() {
         window.location.href = '/dashboard';
       }
     } catch (error) {
-      console.error('Failed to complete onboarding:', error);
+      logger.error('Failed to complete onboarding:', error);
     }
   };
 

@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { NextApiRequest, NextApiResponse } from 'next';
 import Redis from 'ioredis';
+import logger from './logger';
 
 // Redis for session management
 const redis = new Redis({
@@ -44,7 +45,7 @@ export function initWebSocketServer(server: any) {
 
   // Handle connections
   io.on('connection', (socket) => {
-    console.log('New client connected:', socket.id);
+    logger.info('New client connected:', socket.id);
 
     // Join a collaboration room
     socket.on('join-room', async (data: {
@@ -220,7 +221,7 @@ export function initWebSocketServer(server: any) {
 
     // Handle disconnection
     socket.on('disconnect', async () => {
-      console.log('Client disconnected:', socket.id);
+      logger.info('Client disconnected:', socket.id);
       
       // Remove from all rooms
       for (const [roomId, room] of rooms.entries()) {

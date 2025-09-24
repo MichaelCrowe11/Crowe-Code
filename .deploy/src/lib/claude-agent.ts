@@ -22,7 +22,7 @@ class ClaudeCodeAgent {
   constructor(apiKey: string) {
     this.anthropic = new Anthropic({ apiKey });
     this.capabilities = new Map();
-    this.systemPrompt = `You are Crowe Coder, an elite AI programming assistant created by Crowe Logic™.
+  this.systemPrompt = `You are Crowe Coder, an elite AI programming assistant created by CroweCode™.
     
 Your personality:
 - Expert developer with deep knowledge across all programming languages and frameworks
@@ -176,7 +176,7 @@ When suggesting commands or code, ensure they're production-ready and follow bes
       // Add context to system prompt if provided
       let enhancedSystemPrompt = this.systemPrompt;
       if (context) {
-        enhancedSystemPrompt += `\n\nCurrent context:\n- File: ${context.currentFile || 'none'}\n- Language: ${context.language || 'typescript'}\n- Project: ${context.projectName || 'Crowe Logic Platform'}`;
+  enhancedSystemPrompt += `\n\nCurrent context:\n- File: ${context.currentFile || 'none'}\n- Language: ${context.language || 'typescript'}\n- Project: ${context.projectName || 'CroweCode'}`;
       }
 
       const response = await this.anthropic.messages.create({

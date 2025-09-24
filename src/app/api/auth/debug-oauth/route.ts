@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/nextauth-config";
+import logger from '../../../../lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("OAuth debug error:", error);
+    logger.error("OAuth debug error:", error);
 
     return NextResponse.json({
       success: false,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/nextauth-config";
 import { AIProviderManager } from "@/lib/ai-provider";
+import logger from '../../../../lib/logger';
 
 interface GenerationRequest {
   prompt: string;
@@ -181,7 +182,7 @@ Generate sophisticated ${language} code that fulfills this request with ${comple
       };
 
     } catch (error: any) {
-      console.error("Code generation error:", error);
+      logger.error("Code generation error:", error);
 
       return {
         success: false,
@@ -268,12 +269,12 @@ export async function POST(request: NextRequest) {
     const result = await generator.generateCode(body);
 
     // Log generation for analytics
-    console.log(`Quantum generation by ${userId}: ${result.success ? 'SUCCESS' : 'FAILED'}`);
+    logger.info(`Quantum generation by ${userId}: ${result.success ? 'SUCCESS' : 'FAILED'}`);
 
     return NextResponse.json(result);
 
   } catch (error: any) {
-    console.error("Quantum generation error:", error);
+    logger.error("Quantum generation error:", error);
 
     return NextResponse.json(
       {

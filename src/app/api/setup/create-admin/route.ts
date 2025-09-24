@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import logger from '../../../../lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
       }
     });
   } catch (error: any) {
-    console.error('Error creating admin user:', error);
+    logger.error('Error creating admin user:', error);
     return NextResponse.json({
       error: 'Failed to create admin user',
       details: error.message

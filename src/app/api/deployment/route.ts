@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import logger from '../../../lib/logger';
 
 const execAsync = promisify(exec);
 
@@ -96,7 +97,7 @@ class DeploymentService {
         };
       }
     } catch (error) {
-      console.error('Vercel check failed:', error);
+      logger.error('Vercel check failed:', error);
     }
 
     return {
@@ -179,7 +180,7 @@ class DeploymentService {
         };
       }
     } catch (error) {
-      console.error('Railway check failed:', error);
+      logger.error('Railway check failed:', error);
     }
 
     return {
@@ -205,7 +206,7 @@ class DeploymentService {
         };
       }
     } catch (error) {
-      console.error('Docker check failed:', error);
+      logger.error('Docker check failed:', error);
     }
 
     return {
@@ -283,7 +284,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Deployment status error:', error);
+    logger.error('Deployment status error:', error);
     return NextResponse.json(
       { error: 'Failed to get deployment status' },
       { status: 500 }
@@ -320,7 +321,7 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('Deployment action error:', error);
+    logger.error('Deployment action error:', error);
     return NextResponse.json(
       { error: 'Deployment action failed' },
       { status: 500 }

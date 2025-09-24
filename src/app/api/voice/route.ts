@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import logger from '../../../lib/logger';
 
 /**
  * Voice API Integration
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error("Voice API error:", error);
+    logger.error("Voice API error:", error);
     return NextResponse.json(
       { error: "Voice processing failed", fallback: true },
       { status: 500 }

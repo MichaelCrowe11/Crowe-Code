@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, FlaskConical, Droplets, Timer, AlertTriangle, ChevronRight, CheckCircle } from "lucide-react";
+import logger from '../../../lib/logger';
 
 export default function NewExtractPage() {
   const [step, setStep] = useState(1);
@@ -46,7 +47,7 @@ export default function NewExtractPage() {
   };
 
   const handleSubmit = () => {
-    console.log('Submitting extract batch:', formData);
+    logger.info('Submitting extract batch:', formData);
   };
 
   return (

@@ -5,6 +5,7 @@ import { StripeService } from "@/lib/stripe/stripe-service";
 import { PLANS } from "@/lib/stripe/stripe-config";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import logger from '../../../../lib/logger';
 
 // GET /api/stripe/subscription - Get current subscription
 export async function GET(req: NextRequest) {
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
       plan,
     });
   } catch (error) {
-    console.error("Error fetching subscription:", error);
+    logger.error("Error fetching subscription:", error);
     return NextResponse.json(
       { error: "Failed to fetch subscription" },
       { status: 500 }
@@ -114,7 +115,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    console.error("Error updating subscription:", error);
+    logger.error("Error updating subscription:", error);
     return NextResponse.json(
       { error: "Failed to update subscription" },
       { status: 500 }
@@ -138,7 +139,7 @@ export async function getInvoices(req: NextRequest) {
 
     return NextResponse.json({ invoices });
   } catch (error) {
-    console.error("Error fetching invoices:", error);
+    logger.error("Error fetching invoices:", error);
     return NextResponse.json(
       { error: "Failed to fetch invoices" },
       { status: 500 }

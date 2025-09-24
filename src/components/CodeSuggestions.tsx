@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { 
+import logger from '../lib/logger';
   Sparkles, 
   Code2, 
   Brain, 
@@ -158,7 +159,7 @@ export default function CodeSuggestions({
         setLastAnalyzedCode(currentCode);
       }
     } catch (error) {
-      console.error('Failed to analyze code:', error);
+      logger.error('Failed to analyze code:', error);
       
       // Fallback to local analysis
       const localSuggestions = performLocalAnalysis(currentCode, language);
@@ -226,7 +227,7 @@ export default function CodeSuggestions({
         code: `try {
   ${code}
 } catch (error) {
-  console.error('Error:', error);
+  logger.error('Error:', error);
   // Handle error appropriately
 }`,
         language: lang,

@@ -17,6 +17,7 @@ import {
   Settings
 } from 'lucide-react';
 import { formatPrice } from '@/lib/billing/pricing-config';
+import logger from '../../../lib/logger';
 
 interface Subscription {
   id: string;
@@ -78,7 +79,7 @@ export default function BillingDashboard() {
         setUsage(usageData);
       }
     } catch (err) {
-      console.error('Failed to fetch billing data:', err);
+      logger.error('Failed to fetch billing data:', err);
       setError('Failed to load billing information');
     } finally {
       setLoading(false);
@@ -102,7 +103,7 @@ export default function BillingDashboard() {
         throw new Error('Failed to open billing portal');
       }
     } catch (err) {
-      console.error('Billing portal error:', err);
+      logger.error('Billing portal error:', err);
       setError('Failed to open billing portal');
     }
   };

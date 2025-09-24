@@ -31,6 +31,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 import matplotlib.pyplot as plt
 import seaborn as sns
+import logger from '../../lib/logger';
 
 # Load agricultural data
 df = pd.read_csv('crop_yield_data.csv')
@@ -222,7 +223,7 @@ def calculate_vpd(temp, humidity):
                 type="file"
                 accept=".csv,.json,.parquet"
                 className="hidden"
-                onChange={(e) => console.log('File selected:', e.target.files)}
+                onChange={(e) => logger.info('File selected:', e.target.files)}
               />
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AIProviderManager, aiProviderManager } from '@/lib/ai-provider';
+import logger from '../../../../lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
                  process.env.ANTHROPIC_API_KEY ? 'Anthropic' :
                  process.env.OPENAI_API_KEY ? 'OpenAI' : 'Unknown',
         response: `function helloWorld() {
-  console.log('Hello, World!');
+  logger.info('Hello, World!');
 }
 
 // This is a test response to verify AI provider connectivity`,

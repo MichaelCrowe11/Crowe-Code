@@ -3,6 +3,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import path from "path";
 import fs from "fs/promises";
+import logger from '../../../lib/logger';
 
 const execAsync = promisify(exec);
 
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error: any) {
-    console.error("Terminal error:", error);
+    logger.error("Terminal error:", error);
     return NextResponse.json(
       { 
         error: error.message || "Failed to execute command",

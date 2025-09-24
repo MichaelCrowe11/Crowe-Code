@@ -1,5 +1,6 @@
 // src/lib/ai-cache.ts - AI Response Caching System
 import { createHash } from 'crypto';
+import logger from './logger';
 
 // In-memory cache (for development/simple deployments)
 class MemoryCache {
@@ -60,7 +61,7 @@ class RedisCache {
         const { Redis } = require('@upstash/redis');
         this.redis = Redis.fromEnv();
       } catch (error) {
-        console.warn('Redis not available, falling back to memory cache');
+        logger.warn('Redis not available, falling back to memory cache');
         this.redis = null;
       }
     }
@@ -72,7 +73,7 @@ class RedisCache {
     try {
       await this.redis.setex(key, Math.ceil(ttl / 1000), JSON.stringify(value));
     } catch (error) {
-      console.error('Redis cache set error:', error);
+      logger.error('Redis cache set error:', error);
     }
   }
 
@@ -83,7 +84,7 @@ class RedisCache {
       const value = await this.redis.get(key);
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      console.error('Redis cache get error:', error);
+      logger.error('Redis cache get error:', error);
       return null;
     }
   }
@@ -94,7 +95,7 @@ class RedisCache {
     try {
       await this.redis.del(key);
     } catch (error) {
-      console.error('Redis cache delete error:', error);
+      logger.error('Redis cache delete error:', error);
     }
   }
 }
@@ -171,7 +172,7 @@ class AICache {
     const cached = await this.adapter.get(key);
     
     if (cached) {
-      console.log(`AI Cache hit for key: ${key}`);
+      logger.info(`AI Cache hit for key: ${key}`);
       return cached.response;
     }
 
@@ -184,7 +185,7 @@ class AICache {
   async invalidatePattern(pattern: string): Promise<void> {
     // This would require more sophisticated cache backend for pattern matching
     // For now, just log the intent
-    console.log(`Would invalidate cache pattern: ${pattern}`);
+    logger.info(`Would invalidate cache pattern: ${pattern}`);
   }
 
   /**

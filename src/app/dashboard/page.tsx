@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect, Suspense } from "react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   User,
@@ -33,7 +33,7 @@ import {
   Globe,
   MessageSquare,
 } from "lucide-react";
-import CroweLogicLogo from "@/components/branding/CroweLogicLogo";
+import CroweCodeLogo from "@/components/branding/CroweCodeLogo";
 import { CroweLogicBadge } from "@/components/branding/CroweLogicBranding";
 import Link from "next/link";
 import AIChatInterface from "@/components/ai/AIChatInterface";
@@ -65,6 +65,7 @@ const mockProjects = [
 
 function DashboardContent() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "ai" | "quantum" | "collaboration" | "profile" | "apikeys" | "usage" | "billing" | "projects">("overview");
   const [showNewKeyModal, setShowNewKeyModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
@@ -82,8 +83,21 @@ function DashboardContent() {
     );
   }
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth/signin?callbackUrl=/dashboard");
+    }
+  }, [status, router]);
+
   if (status === "unauthenticated" || !session) {
-    redirect("/auth/signin");
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <RefreshCw className="h-5 w-5 animate-spin text-blue-400" />
+          <span className="text-white/60">Redirecting to sign in…</span>
+        </div>
+      </div>
+    );
   }
 
   const handleGenerateApiKey = () => {
@@ -105,7 +119,7 @@ function DashboardContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
-              <CroweLogicLogo size="sm" showText showTagline={false} variant="glow" />
+              <CroweCodeLogo size="sm" showText showTagline={false} />
 
               <nav className="hidden md:flex items-center gap-6">
                 <Link href="/dashboard" className="text-sm text-white font-medium">Dashboard</Link>
@@ -261,7 +275,7 @@ function DashboardContent() {
               <div className="space-y-6">
                 <div>
                   <h1 className="text-2xl font-bold text-white mb-2">Welcome back, {session.user?.name}</h1>
-                  <p className="text-white/60">Here's an overview of your Crowe Logic Platform activity</p>
+                  <p className="text-white/60">Here’s your CroweCode workspace at a glance</p>
                 </div>
 
                 {/* Stats Grid */}

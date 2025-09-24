@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { multiModalPipeline } from '@/lib/ai/multi-modal-pipeline';
+import logger from '../../../../lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error processing multi-modal input:', error);
+    logger.error('Error processing multi-modal input:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to process multi-modal input' },
       { status: 500 }
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching pipeline info:', error);
+    logger.error('Error fetching pipeline info:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch pipeline information' },
       { status: 500 }

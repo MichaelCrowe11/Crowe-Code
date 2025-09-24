@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { 
+import logger from '../lib/logger';
   Search, 
   Replace,
   FileText,
@@ -106,7 +107,7 @@ export default function SearchReplace({ onFileOpen }: SearchReplaceProps) {
         setExpandedFiles(autoExpand);
       }
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error('Search failed:', error);
       setResults([]);
     } finally {
       setIsSearching(false);
@@ -142,7 +143,7 @@ export default function SearchReplace({ onFileOpen }: SearchReplaceProps) {
         setSelectedResults(new Set());
       }
     } catch (error) {
-      console.error('Replace failed:', error);
+      logger.error('Replace failed:', error);
     } finally {
       setIsReplacing(false);
     }

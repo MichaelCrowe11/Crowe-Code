@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { exec } from "child_process";
 import { promisify } from "util";
+import logger from '../../../lib/logger';
 
 const execAsync = promisify(exec);
 
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
         }
       } catch (rgError) {
         // Fallback to manual search if ripgrep is not available
-        console.log('Ripgrep not available, using fallback search');
+        logger.info('Ripgrep not available, using fallback search');
         
         // Simple recursive file search
         async function searchInDirectory(dir: string) {
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
         await searchInDirectory(projectRoot);
       }
     } catch (error) {
-      console.error('Search error:', error);
+      logger.error('Search error:', error);
     }
 
     return NextResponse.json({
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
       totalMatches: results.length
     });
   } catch (error: any) {
-    console.error("Search API error:", error);
+    logger.error("Search API error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to perform search" },
       { status: 500 }
@@ -168,7 +169,7 @@ export async function PUT(request: NextRequest) {
           const content = await fs.readFile(filePath, 'utf-8');
           fileChanges.set(filePath, content);
         } catch (e) {
-          console.error(`Failed to read file: ${filePath}`);
+          logger.error(`Failed to read file: ${filePath}`);
           continue;
         }
       }
@@ -206,7 +207,7 @@ export async function PUT(request: NextRequest) {
       try {
         await fs.writeFile(filePath, lines.join('\n'), 'utf-8');
       } catch (e) {
-        console.error(`Failed to write file: ${filePath}`);
+        logger.error(`Failed to write file: ${filePath}`);
       }
     }
 
@@ -216,7 +217,7 @@ export async function PUT(request: NextRequest) {
       filesModified: fileChanges.size
     });
   } catch (error: any) {
-    console.error("Replace API error:", error);
+    logger.error("Replace API error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to perform replace" },
       { status: 500 }

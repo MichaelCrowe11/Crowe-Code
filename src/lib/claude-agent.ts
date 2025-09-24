@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import logger from './logger';
 
 export interface AgentCapability {
   name: string;
@@ -195,7 +196,7 @@ When suggesting commands or code, ensure they're production-ready and follow bes
         usage: response.usage
       };
     } catch (error: any) {
-      console.error("Crowe Coder error:", error);
+      logger.error("Crowe Coder error:", error);
       throw error;
     }
   }

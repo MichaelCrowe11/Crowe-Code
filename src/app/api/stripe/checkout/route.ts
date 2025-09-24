@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth/nextauth-config";
 import { StripeService } from "@/lib/stripe/stripe-service";
 import { PLANS } from "@/lib/stripe/stripe-config";
 import { z } from "zod";
+import logger from '../../../../lib/logger';
 
 const checkoutSchema = z.object({
   planId: z.enum(["DEVELOPER", "TEAM", "ENTERPRISE"]),
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("Error creating checkout session:", error);
+    logger.error("Error creating checkout session:", error);
     return NextResponse.json(
       { error: "Failed to create checkout session" },
       { status: 500 }

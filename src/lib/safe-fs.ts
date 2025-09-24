@@ -2,6 +2,7 @@
 import { resolve, dirname, extname, normalize, sep } from 'node:path';
 import { stat, readFile, writeFile, readdir, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import logger from './logger';
 
 // Configuration
 const BASE_DIR = process.env.CROWE_WORKSPACE_DIR || process.cwd();
@@ -327,7 +328,7 @@ export async function getFileTree(relativePath: string = '', maxDepth: number = 
 
     return tree;
   } catch (error) {
-    console.warn('Error building file tree:', error);
+    logger.warn('Error building file tree:', error);
     return [];
   }
 }

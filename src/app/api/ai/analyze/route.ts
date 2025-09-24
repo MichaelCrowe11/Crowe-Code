@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth/nextauth-config";
 import { generateCode } from "@/lib/ai-provider";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import logger from '../../../../lib/logger';
 
 const analyzeSchema = z.object({
   code: z.string(),
@@ -104,7 +105,7 @@ Return ONLY valid JSON, no additional text.`;
         suggestions = parsed.suggestions || [];
       }
     } catch (parseError) {
-      console.error("Failed to parse AI response:", parseError);
+      logger.error("Failed to parse AI response:", parseError);
       // Provide fallback suggestions
       suggestions = [
         {
@@ -168,7 +169,7 @@ Return ONLY valid JSON, no additional text.`;
       );
     }
 
-    console.error("Error analyzing code:", error);
+    logger.error("Error analyzing code:", error);
     return NextResponse.json(
       { error: "Failed to analyze code" },
       { status: 500 }

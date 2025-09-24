@@ -1,5 +1,5 @@
 /**
- * Authentication Middleware for Crowe Logic Platform
+ * Authentication Middleware for CroweCode Platform
  * Handles JWT validation, session management, and role-based access control
  */
 

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth/nextauth-config";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
 import { z } from "zod";
+import logger from '../../../../lib/logger';
 
 const createApiKeySchema = z.object({
   name: z.string().min(1).max(100),
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(maskedKeys);
   } catch (error) {
-    console.error("Error fetching API keys:", error);
+    logger.error("Error fetching API keys:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -156,7 +157,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error("Error creating API key:", error);
+    logger.error("Error creating API key:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -220,7 +221,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ message: "API key deleted successfully" });
   } catch (error) {
-    console.error("Error deleting API key:", error);
+    logger.error("Error deleting API key:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -110,14 +110,14 @@ function SignInContent() {
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg blur-md opacity-50" />
                     <Image
                       src="/crowe-avatar.png"
-                      alt="Crowe Logic"
+                      alt="CroweCode"
                       width={32}
                       height={32}
                       className="relative rounded-lg"
                     />
                   </div>
                   <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Crowe Logic
+                    CroweCode
                   </span>
                 </div>
               </HolographicDisplay>

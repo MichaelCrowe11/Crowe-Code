@@ -6,7 +6,7 @@
   "regions": ["iad1"],
   "build": {
     "env": {
-      "NEXT_PUBLIC_APP_URL": "https://croweos.com"
+      "NEXT_PUBLIC_APP_URL": "https://www.crowecode.com"
     }
   }
 }

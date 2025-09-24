@@ -1,5 +1,5 @@
 /**
- * Security Middleware for Crowe Logic Platform
+ * Security Middleware for CroweCode Platform
  * Implements CORS, CSP, XSS protection, and other security headers
  */
 

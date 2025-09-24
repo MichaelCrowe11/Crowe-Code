@@ -41,6 +41,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import logger from '../../lib/logger';
 
 interface AIAgent {
   id: string;
@@ -317,10 +318,10 @@ export default function AIAgentMarketplace() {
 
       if (response.ok) {
         // Success notification
-        console.log(`Agent ${agent.name} installed successfully`);
+        logger.info(`Agent ${agent.name} installed successfully`);
       }
     } catch (error) {
-      console.error("Failed to install agent:", error);
+      logger.error("Failed to install agent:", error);
     }
   };
 
