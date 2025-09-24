@@ -5,8 +5,11 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   poweredByHeader: false,
   compress: true,
+  productionBrowserSourceMaps: false,
+  generateEtags: true,
   eslint: {
     ignoreDuringBuilds: true,
+    dirs: ['src'],
   },
   typescript: {
     ignoreBuildErrors: true,
@@ -122,57 +125,46 @@ const nextConfig: NextConfig = {
 
   // Webpack configuration (only used when not using Turbopack)
   webpack: (config, { isServer }) => {
-    // Only apply webpack optimizations when not using Turbopack
-    if (process.env.NODE_ENV === 'production') {
-      // Optimizations
+    // Memory optimization for build
+    if (!isServer) {
       config.optimization = {
         ...config.optimization,
-        moduleIds: 'deterministic',
-        runtimeChunk: isServer ? undefined : 'single',
+        minimize: true,
+        sideEffects: false,
+        usedExports: true,
         splitChunks: {
           chunks: 'all',
+          minSize: 20000,
+          maxSize: 244000,
           cacheGroups: {
             default: false,
             vendors: false,
             framework: {
               name: 'framework',
               chunks: 'all',
-              test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
               priority: 40,
               enforce: true,
-            },
-            lib: {
-              test(module: any) {
-                return module.size() > 160000 &&
-                  /node_modules[/\\]/.test(module.identifier());
-              },
-              name(module: any) {
-                const hash = require('crypto').createHash('sha1');
-                hash.update(module.identifier());
-                return hash.digest('hex').substring(0, 8);
-              },
-              priority: 30,
-              minChunks: 1,
-              reuseExistingChunk: true,
             },
             commons: {
               name: 'commons',
               minChunks: 2,
               priority: 20,
             },
-            shared: {
-              name(module: any, chunks: any) {
-                return require('crypto')
-                  .createHash('sha1')
-                  .update(chunks.reduce((acc: string, chunk: any) => acc + chunk.name, ''))
-                  .digest('hex');
-              },
-              priority: 10,
-              minChunks: 2,
-              reuseExistingChunk: true,
-            },
           },
         },
+      };
+
+      // Ignore certain modules to reduce bundle size
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@sentry/node': false,
+        'mongodb-client-encryption': false,
+        'aws-sdk': false,
+        'snappy': false,
+        'aws-crt': false,
+        'kerberos': false,
+        '@mongodb-js/zstd': false,
       };
     }
 

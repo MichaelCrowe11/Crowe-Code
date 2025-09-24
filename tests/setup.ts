@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import { TextEncoder, TextDecoder } from 'util';
+import logger from '../src/lib/logger';
 
 // Polyfill TextEncoder/TextDecoder for Node environment
 Object.assign(global, {

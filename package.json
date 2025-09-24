@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' next build",
+    "build:analyze": "NODE_OPTIONS='--max-old-space-size=8192' ANALYZE=true next build",
+    "build:local": "NODE_OPTIONS='--max-old-space-size=8192' next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:fix": "eslint --fix",
     "test": "vitest run --reporter=verbose",
     "test:dev": "vitest",
     "test:unit": "vitest run --dir tests/unit",
